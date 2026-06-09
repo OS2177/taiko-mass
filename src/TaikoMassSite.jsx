@@ -497,11 +497,6 @@ export default function TaikoMassSite() {
             <span className="arr" style={{ fontSize:13 }}>→</span>
           </a>
         ))}
-
-        <div style={{ marginTop:"12vh", display:"flex", justifyContent:"space-between", borderTop:"1px solid rgba(125,133,150,0.14)", paddingTop:28 }}>
-          <span className="lbl">Taiko Mass</span>
-          <span className="lbl">West Flanders · {new Date().getFullYear()}</span>
-        </div>
       </main>
 
       {/* ENERGY — a second square field, mirrored, hot "sun" palette. */}
@@ -512,7 +507,7 @@ export default function TaikoMassSite() {
             <div style={{ width:"100%", height:"100%", transform:"scaleY(-1)" }}>
               <FieldSquare palette="sun" />
             </div>
-            <div className="lbl" style={{ position:"absolute", top:28, left:40, color:C.ember, pointerEvents:"none" }}>Energy</div>
+            <div className="lbl" style={{ position:"absolute", top:28, left:40, color:C.ember, pointerEvents:"none" }}>Taiko&nbsp;Mass</div>
           </div>
         </div>
       </section>
