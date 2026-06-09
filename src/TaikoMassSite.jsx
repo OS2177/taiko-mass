@@ -235,10 +235,8 @@ function FieldSquare({ palette = "dawn" }) {
           m.phase = (cur + diff * 0.08 + 3) % 3;
         }
       }
-      const baseBlur = 16;
-      const blur = baseBlur + m.d * 30;
       ctx.clearRect(0,0,W,H);
-      ctx.save(); ctx.filter=`blur(${blur}px)`; ctx.drawImage(buf,-40,-40,W+80,H+80); ctx.restore();
+      ctx.drawImage(buf,-40,-40,W+80,H+80);
 
       const seamY=H*0.5, seamH=H*0.04, rad=Math.min(W,H)*0.21;
       const cx=W/2, cy=H*0.5; // dead center
@@ -254,7 +252,7 @@ function FieldSquare({ palette = "dawn" }) {
         for(let i=1;i<shape.length;i++) g.lineTo(shape[i][0],shape[i][1]); g.closePath(); };
 
       // soft mirrored reflection below the seam
-      ctx.save(); ctx.globalAlpha=0.22; ctx.filter=`blur(${5+m.d*8}px)`;
+      ctx.save(); ctx.globalAlpha=0.18;
       const refShape=shape.map(p=>[p[0], refSeam + (refSeam-p[1])]);
       ctx.beginPath(); ctx.moveTo(refShape[0][0],refShape[0][1]);
       for(let i=1;i<refShape.length;i++) ctx.lineTo(refShape[i][0],refShape[i][1]); ctx.closePath();
@@ -264,15 +262,9 @@ function FieldSquare({ palette = "dawn" }) {
       ctx.restore();
 
       // THE FORM — sun gradient from the image: golden top, soft fade into red
-      // edges soften while morphing, ease back to crisp as it settles
-      const morphRate = Math.abs(m.vel) + (m.d * 0.002);
-      const edgeSoft = Math.min(7, morphRate * 90);
       const pg=ctx.createLinearGradient(0,cy-rad,0,cy+rad);
       for(const [stop,col] of PAL.form) pg.addColorStop(stop,col);
-      ctx.save();
-      ctx.filter = `blur(${edgeSoft}px)`;
       drawPath(ctx); ctx.fillStyle=pg; ctx.fill();
-      ctx.restore();
       // hairline edge fades out as the form softens during morph
       drawPath(ctx);
       ctx.strokeStyle=`rgba(${PAL.edge}, ${0.45 * (1 - Math.min(1, m.vel*30))})`;
@@ -465,6 +457,9 @@ export default function TaikoMassSite() {
         .hero3{display:flex;width:100%;max-width:880px;aspect-ratio:1/1;margin:0 auto;}
         @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
       `}</style>
+
+      {/* warm tint — fixed overlay across the whole page */}
+      <div style={{ position:"fixed", inset:0, pointerEvents:"none", zIndex:9999, background:"#ff8a3d", mixBlendMode:"overlay", opacity:0.22 }} />
 
       {/* HERO — the Matter field, constrained to the content column (maxWidth 880, 40px gutters). */}
       <section className="hero" style={{ overflow:"hidden", padding:"0" }}>
