@@ -1,23 +1,44 @@
-import React, { useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 // TAIKO MASS — the site.
 // Hero descends through three fields: A Fade → B Square → C Mass.
 // Energy forming into matter. Builds primary, essays secondary. Monospace only.
 
-const C = { void: "#06070b", ink:"#0b0d14", ash: "#7d8596", pale: "#c9cdd6", ember: "#d98a6a" };
+const C = { void: "#06070b", ink:"#0b0d14", ash: "#7d8596", pale: "#c9cdd6", ember: "#d98a6a", mint: "#00e5a0" };
 
 const BUILDS = [
-  { title: "Navigator", note: "Cognitive workspace", status: "Refinement", href:"#" },
-  { title: "SOMA", note: "Neuroinflammatory food mapping", status: "Development", href:"#" },
-  { title: "Wordmark", note: "Identity-to-interface compiler", status: "Building", href:"#" },
-  { title: "Orbit", note: "Discovery platform for makers", status: "Prototype", href:"#" },
+  { title: "Orbit", note: "Discovery platform for makers", status: "Live", date: "2026-06",
+    url: "https://orbit-nine-liard.vercel.app/", thumb: "/orbit-thumb.png",
+    blurb: "A discovery platform for makers — surfacing projects, the people building them, and the orbits they move in." },
+  { title: "Navigator", note: "Cognitive workspace", status: "Building", date: "2026-05",
+    url: "", thumb: "",
+    blurb: "A cognitive workspace for thinking alongside an agent — capture, connect, and refine ideas on one living surface." },
+  { title: "Wordmark", note: "Identity-to-interface compiler", status: "Building", date: "2026-04",
+    url: "", thumb: "",
+    blurb: "Reads a brief and synthesises a coherent visual identity, then renders it as an editable, exportable interface system." },
+  { title: "SOMA", note: "Neuroinflammatory food mapping", status: "Building", date: "2026-03",
+    url: "", thumb: "",
+    blurb: "Maps how foods drive neuroinflammation, turning personal symptom data into a clearer picture of what to eat." },
 ];
 const ESSAYS = [
-  { title: "What Is Eating You", note: "On the system that consumes attention", href:"#" },
-  { title: "The Ecology of Awareness", note: "Consciousness in information fields", href:"#" },
-  { title: "On the Edge", note: "Marginality as a driver of change", href:"#" },
-  { title: "The Open Loop", note: "The body as process", href:"#" },
+  { title: "What Is Eating You", note: "On the system that consumes attention", date: "2026-05",
+    url: "", thumb: "",
+    blurb: "On the system that consumes attention — what feeds on our focus, and what it costs to feed it." },
+  { title: "The Ecology of Awareness", note: "Consciousness in information fields", date: "2026-04",
+    url: "", thumb: "",
+    blurb: "Consciousness as an ecology — how awareness forms, drifts, and settles inside dense information fields." },
+  { title: "On the Edge", note: "Marginality as a driver of change", date: "2026-02",
+    url: "", thumb: "",
+    blurb: "Marginality as a driver of change — why the edge, not the centre, is where new forms begin." },
+  { title: "The Open Loop", note: "The body as process", date: "2026-01",
+    url: "", thumb: "",
+    blurb: "The body as process, not object — an open loop of exchange that never quite closes." },
 ];
+
+const STATUS_RANK = { Live: 0, Building: 1 };
+const sortedBuilds = [...BUILDS].sort((a,b)=>
+  (STATUS_RANK[a.status] - STATUS_RANK[b.status]) || (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
+const sortedEssays = [...ESSAYS].sort((a,b)=> (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 
 function useMembrane(canvasRef) {
   const s = useRef({ tx: 0.5, ty: 0.45, x: 0.5, y: 0.45, t: 0, reduced: false });
@@ -436,6 +457,61 @@ function StillMass(){
   return <canvas ref={ref} style={{width:"100%",height:"100%",display:"block"}}/>;
 }
 
+// ---------- Builds / Writing — click-to-expand accordion ----------
+function WorkRow({ item, size, open, onOpen, onClose }){
+  const hasUrl = item.url && item.url !== "#";
+  const toggle = ()=> onOpen(open ? null : item._key);
+  return (
+    <div className="workrow" onMouseLeave={open ? onClose : undefined}>
+      <div className="row" role="button" tabIndex={0}
+        onClick={toggle}
+        onKeyDown={(e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); } }}>
+        <span className="ttl" style={{ fontSize:size, color:C.pale }}>{item.title}</span>
+        <span style={{ flex:1, color:C.ash, fontSize:12 }}>{item.note}</span>
+        {item.status && (
+          <span className="lbl" style={{ color: item.status==="Live" ? C.mint : undefined }}>{item.status}</span>
+        )}
+        <span className="arr" style={{ fontSize:14, transform: open ? "rotate(90deg)" : "rotate(0deg)" }}>→</span>
+      </div>
+      <div className={open ? "preview" : "preview closing"} style={{ maxHeight: open ? 260 : 0 }}>
+        <div className="preview-inner">
+          <div className="preview-thumb">
+            <span className="lbl" style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", color:C.ash, textAlign:"center", padding:"0 12px" }}>{item.title}</span>
+            {item.thumb && (
+              <img src={item.thumb} alt={item.title}
+                style={{ position:"relative", width:"100%", height:"100%", objectFit:"contain" }}
+                onError={(e)=>{ e.currentTarget.style.display="none"; }} />
+            )}
+          </div>
+          <div className="preview-body">
+            <p style={{ margin:0, color:C.pale, fontSize:13, lineHeight:1.65 }}>{item.blurb}</p>
+            {hasUrl
+              ? <a className="visit" href={item.url} target="_blank" rel="noopener">Visit ↗</a>
+              : <span className="visit" style={{ opacity:0.5 }}>Coming soon</span>}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WorkList({ items, size }){
+  const [openKey, setOpenKey] = useState(null);
+  const timer = useRef(null);
+  const setOpen = (key)=>{ clearTimeout(timer.current); setOpenKey(key); };
+  const closeSoon = ()=>{ clearTimeout(timer.current); timer.current = setTimeout(()=>setOpenKey(null), 220); };
+  useEffect(()=>()=>clearTimeout(timer.current), []);
+  return (
+    <div>
+      {items.map((item,i)=>{
+        const key = item.title + i;
+        item._key = key;
+        return <WorkRow key={key} item={item} size={size} open={openKey===key} onOpen={setOpen} onClose={closeSoon} />;
+      })}
+    </div>
+  );
+}
+
 export default function TaikoMassSite() {
   return (
     <div style={{ background:C.void, color:C.pale, fontFamily:"'Space Mono', monospace" }}>
@@ -448,9 +524,17 @@ export default function TaikoMassSite() {
         .row{border-top:1px solid rgba(125,133,150,0.14);padding:26px 0;display:flex;justify-content:space-between;align-items:baseline;gap:24px;transition:border-color .5s,padding-left .4s;cursor:pointer;}
         .row:hover{border-color:rgba(217,138,106,0.5);padding-left:18px;}
         .row:hover .ttl{color:${C.ember};}
-        .row:hover .arr{opacity:1;transform:translateX(0);}
+        .row:hover .arr{opacity:1;}
         .ttl{transition:color .5s;}
-        .arr{opacity:0;transform:translateX(-8px);transition:all .4s;color:${C.ember};}
+        .arr{opacity:0.5;transition:transform .4s cubic-bezier(0.16,1,0.3,1),opacity .4s,color .4s;color:${C.ember};}
+        .preview{overflow:hidden;max-height:0;transition:max-height .8s cubic-bezier(0.22,0.61,0.36,1);}
+        .preview.closing{transition:max-height .55s cubic-bezier(0.16,1,0.3,1);}
+        .preview-inner{display:flex;gap:24px;padding:4px 0 30px;}
+        .preview-thumb{position:relative;flex:0 0 240px;height:150px;border:1px solid rgba(125,133,150,0.18);border-radius:2px;overflow:hidden;background:rgba(125,133,150,0.06);}
+        .preview-body{flex:1;display:flex;flex-direction:column;gap:14px;}
+        .visit{display:inline-block;color:${C.ember};padding:6px 0;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;transition:opacity .3s,letter-spacing .3s;}
+        .visit:hover{opacity:0.7;letter-spacing:0.24em;}
+        @media(max-width:680px){.preview-inner{flex-direction:column;}.preview-thumb{flex:0 0 auto;width:100%;}}
         .panel{position:relative;flex:1;overflow:hidden;}
         :focus-visible{outline:1px solid ${C.ember};outline-offset:4px;}
         /* hero: a centered square field, edge-to-edge canvas */
@@ -475,23 +559,10 @@ export default function TaikoMassSite() {
       {/* WORKS */}
       <main style={{ maxWidth:880, margin:"0 auto", padding:"12vh 40px 14vh", position:"relative", background:C.void }}>
         <div className="lbl" style={{ marginBottom:32 }}>Builds</div>
-        {BUILDS.map((b,i)=>(
-          <a key={i} href={b.href} className="row">
-            <span className="ttl" style={{ fontSize:19, color:C.pale }}>{b.title}</span>
-            <span style={{ flex:1, color:C.ash, fontSize:12 }}>{b.note}</span>
-            <span className="lbl">{b.status}</span>
-            <span className="arr" style={{ fontSize:14 }}>→</span>
-          </a>
-        ))}
+        <WorkList items={sortedBuilds} size={19}/>
 
         <div className="lbl" style={{ margin:"10vh 0 32px" }}>Writing</div>
-        {ESSAYS.map((e,i)=>(
-          <a key={i} href={e.href} className="row" style={{ padding:"22px 0" }}>
-            <span className="ttl" style={{ fontSize:15, color:C.pale }}>{e.title}</span>
-            <span style={{ flex:1, color:C.ash, fontSize:12 }}>{e.note}</span>
-            <span className="arr" style={{ fontSize:13 }}>→</span>
-          </a>
-        ))}
+        <WorkList items={sortedEssays} size={15}/>
       </main>
 
       {/* ENERGY — a second square field, mirrored, hot "sun" palette. */}
