@@ -1,44 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
+import { sortedBuilds, sortedEssays } from "./content";
 
 // TAIKO MASS — the site.
 // Hero descends through three fields: A Fade → B Square → C Mass.
 // Energy forming into matter. Builds primary, essays secondary. Monospace only.
 
 const C = { void: "#06070b", ink:"#0b0d14", ash: "#7d8596", pale: "#c9cdd6", ember: "#d98a6a", mint: "#00e5a0" };
-
-const BUILDS = [
-  { title: "Orbit", note: "Discovery platform for makers", status: "Live", date: "2026-06",
-    url: "https://orbit-nine-liard.vercel.app/", thumb: "/orbit-thumb.png",
-    blurb: "A discovery platform for makers — surfacing projects, the people building them, and the orbits they move in." },
-  { title: "Navigator", note: "Cognitive workspace", status: "Building", date: "2026-05",
-    url: "", thumb: "",
-    blurb: "A cognitive workspace for thinking alongside an agent — capture, connect, and refine ideas on one living surface." },
-  { title: "Wordmark", note: "Identity-to-interface compiler", status: "Building", date: "2026-04",
-    url: "", thumb: "",
-    blurb: "Reads a brief and synthesises a coherent visual identity, then renders it as an editable, exportable interface system." },
-  { title: "SOMA", note: "Neuroinflammatory food mapping", status: "Building", date: "2026-03",
-    url: "", thumb: "",
-    blurb: "Maps how foods drive neuroinflammation, turning personal symptom data into a clearer picture of what to eat." },
-];
-const ESSAYS = [
-  { title: "What Is Eating You", note: "On the system that consumes attention", date: "2026-05",
-    url: "", thumb: "",
-    blurb: "On the system that consumes attention — what feeds on our focus, and what it costs to feed it." },
-  { title: "The Ecology of Awareness", note: "Consciousness in information fields", date: "2026-04",
-    url: "", thumb: "",
-    blurb: "Consciousness as an ecology — how awareness forms, drifts, and settles inside dense information fields." },
-  { title: "On the Edge", note: "Marginality as a driver of change", date: "2026-02",
-    url: "", thumb: "",
-    blurb: "Marginality as a driver of change — why the edge, not the centre, is where new forms begin." },
-  { title: "The Open Loop", note: "The body as process", date: "2026-01",
-    url: "", thumb: "",
-    blurb: "The body as process, not object — an open loop of exchange that never quite closes." },
-];
-
-const STATUS_RANK = { Live: 0, Building: 1 };
-const sortedBuilds = [...BUILDS].sort((a,b)=>
-  (STATUS_RANK[a.status] - STATUS_RANK[b.status]) || (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
-const sortedEssays = [...ESSAYS].sort((a,b)=> (a.date < b.date ? 1 : a.date > b.date ? -1 : 0));
 
 function useMembrane(canvasRef) {
   const s = useRef({ tx: 0.5, ty: 0.45, x: 0.5, y: 0.45, t: 0, reduced: false });
