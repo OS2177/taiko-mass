@@ -425,7 +425,7 @@ function StillMass(){
 }
 
 // ---------- Builds / Writing — click-to-expand accordion ----------
-function WorkRow({ item, size, open, onOpen, onClose }){
+function WorkRow({ item, size, open, onOpen, onClose, onRead }){
   const hasUrl = item.url && item.url !== "#";
   const toggle = ()=> onOpen(open ? null : item._key);
   return (
@@ -442,19 +442,30 @@ function WorkRow({ item, size, open, onOpen, onClose }){
       </div>
       <div className={open ? "preview" : "preview closing"} style={{ maxHeight: open ? 260 : 0 }}>
         <div className="preview-inner">
-          <div className="preview-thumb">
-            <span className="lbl" style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", color:C.ash, textAlign:"center", padding:"0 12px" }}>{item.title}</span>
-            {item.thumb && (
-              <img src={item.thumb} alt={item.title}
-                style={{ position:"relative", width:"100%", height:"100%", objectFit:"contain" }}
-                onError={(e)=>{ e.currentTarget.style.display="none"; }} />
-            )}
-          </div>
+          {!item.body && (
+            <div className="preview-thumb">
+              <span className="lbl" style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", color:C.ash, textAlign:"center", padding:"0 12px" }}>{item.title}</span>
+              {item.thumb && (
+                <img src={item.thumb} alt={item.title}
+                  style={{ position:"relative", width:"100%", height:"100%", objectFit:"contain" }}
+                  onError={(e)=>{ e.currentTarget.style.display="none"; }} />
+              )}
+            </div>
+          )}
           <div className="preview-body">
             <p style={{ margin:0, color:C.pale, fontSize:13, lineHeight:1.65 }}>{item.blurb}</p>
-            {hasUrl
-              ? <a className="visit" href={item.url} target="_blank" rel="noopener">Visit ↗</a>
-              : <span className="visit" style={{ opacity:0.5 }}>Coming soon</span>}
+            <div style={{ display:"flex", gap:20, alignItems:"center" }}>
+              {item.body && (
+                <button className="visit" onClick={()=>onRead(item)}
+                  style={{ background:"none", border:"none", cursor:"pointer", padding:"6px 0" }}>Read ↗</button>
+              )}
+              {!item.body && hasUrl && (
+                <a className="visit" href={item.url} target="_blank" rel="noopener">Visit ↗</a>
+              )}
+              {!item.body && !hasUrl && (
+                <span className="visit" style={{ opacity:0.5 }}>Coming soon</span>
+              )}
+            </div>
           </div>
         </div>
       </div>
@@ -462,7 +473,7 @@ function WorkRow({ item, size, open, onOpen, onClose }){
   );
 }
 
-function WorkList({ items, size }){
+function WorkList({ items, size, onRead }){
   const [openKey, setOpenKey] = useState(null);
   const timer = useRef(null);
   const setOpen = (key)=>{ clearTimeout(timer.current); setOpenKey(key); };
@@ -473,13 +484,65 @@ function WorkList({ items, size }){
       {items.map((item,i)=>{
         const key = item.title + i;
         item._key = key;
-        return <WorkRow key={key} item={item} size={size} open={openKey===key} onOpen={setOpen} onClose={closeSoon} />;
+        return <WorkRow key={key} item={item} size={size} open={openKey===key} onOpen={setOpen} onClose={closeSoon} onRead={onRead} />;
       })}
     </div>
   );
 }
 
+// ---------- Essay reading room — tiny markdown renderer ----------
+function renderInline(text){
+  // split on **bold** / *italic*, keeping the delimiters
+  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
+  return parts.map((p,i)=>{
+    if(p.startsWith("**") && p.endsWith("**")) return <strong key={i}>{p.slice(2,-2)}</strong>;
+    if(p.startsWith("*") && p.endsWith("*")) return <em key={i}>{p.slice(1,-1)}</em>;
+    return <span key={i}>{p}</span>;
+  });
+}
+
+function Markdown({ text }){
+  const blocks = text.split(/\n\s*\n/);
+  return blocks.map((block,i)=>{
+    const b = block.trim();
+    if(!b) return null;
+    if(b.startsWith("## ")) return <h2 key={i} className="rr-h2">{renderInline(b.slice(3))}</h2>;
+    if(b.startsWith("> ")) return <blockquote key={i} className="rr-quote">{renderInline(b.slice(2))}</blockquote>;
+    return <p key={i} className="rr-p">{renderInline(b)}</p>;
+  });
+}
+
+function ReadingRoom({ essay, onClose }){
+  useEffect(()=>{
+    if(!essay) return;
+    const onKey = (e)=>{ if(e.key==="Escape") onClose(); };
+    addEventListener("keydown", onKey);
+    document.body.style.overflow = "hidden";
+    return ()=>{ removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
+  }, [essay, onClose]);
+  if(!essay) return null;
+  return (
+    <div className="rr-scroll" onClick={onClose}>
+      <div className="rr-bg" />
+      <div className="rr-scrim" />
+      <button className="rr-close" onClick={(e)=>{ e.stopPropagation(); onClose(); }}>✕</button>
+      <div className="rr-fade" onClick={(e)=>e.stopPropagation()}>
+        <article className="rr-col">
+          <div className="lbl" style={{ color:C.ember }}>{essay.date}</div>
+          <h1 className="rr-title">{essay.title}</h1>
+          <div className="lbl" style={{ color:"#8a8a90" }}>{essay.note}</div>
+          <Markdown text={essay.body} />
+          {essay.url!=="#" && (
+            <a className="visit" href={essay.url} target="_blank" rel="noopener" style={{ color:C.ember }}>Read on the web ↗</a>
+          )}
+        </article>
+      </div>
+    </div>
+  );
+}
+
 export default function TaikoMassSite() {
+  const [reading, setReading] = useState(null);
   return (
     <div style={{ background:C.void, color:C.pale, fontFamily:"'Space Mono', monospace" }}>
       <style>{`
@@ -502,6 +565,18 @@ export default function TaikoMassSite() {
         .visit{display:inline-block;color:${C.ember};padding:6px 0;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;transition:opacity .3s,letter-spacing .3s;}
         .visit:hover{opacity:0.7;letter-spacing:0.24em;}
         @media(max-width:680px){.preview-inner{flex-direction:column;}.preview-thumb{flex:0 0 auto;width:100%;}}
+        .rr-scroll{position:fixed;inset:0;z-index:10000;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#faf8f5;}
+        .rr-bg{display:none;} .rr-scrim{display:none;}
+        .rr-close{position:fixed;top:24px;right:28px;z-index:3;background:none;border:none;color:#9a9aa0;font-size:20px;cursor:pointer;line-height:1;transition:color .3s,transform .3s;}
+        .rr-close:hover{color:#d98a6a;transform:rotate(90deg);}
+        .rr-fade{position:relative;z-index:2;animation:rrFade .5s cubic-bezier(0.22,0.61,0.36,1);}
+        @keyframes rrFade{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+        .rr-col{position:relative;max-width:660px;margin:0 auto;padding:14vh 28px 20vh;}
+        .rr-title{font-family:'Space Mono',monospace;color:#1a1a1a;font-size:29px;line-height:1.25;letter-spacing:0.01em;margin:0 0 14px;font-weight:700;}
+        .rr-h2{font-family:'Space Mono',monospace;color:#d98a6a;font-size:12px;letter-spacing:0.3em;text-transform:uppercase;margin:54px 0 18px;font-weight:700;}
+        .rr-p{font-family:'Space Mono',monospace;color:#26262b;font-size:15px;line-height:1.9;margin:0 0 22px;}
+        .rr-quote{font-family:'Space Mono',monospace;color:#1a1a1a;font-size:16px;line-height:1.7;border-left:2px solid #d98a6a;padding-left:22px;margin:30px 0;}
+        @media(max-width:680px){.rr-col{padding:12vh 22px 16vh;}.rr-title{font-size:22px;}.rr-p{font-size:14px;}}
         .panel{position:relative;flex:1;overflow:hidden;}
         :focus-visible{outline:1px solid ${C.ember};outline-offset:4px;}
         /* hero: a centered square field, edge-to-edge canvas */
@@ -526,11 +601,13 @@ export default function TaikoMassSite() {
       {/* WORKS */}
       <main style={{ maxWidth:880, margin:"0 auto", padding:"12vh 40px 14vh", position:"relative", background:C.void }}>
         <div className="lbl" style={{ marginBottom:32 }}>Builds</div>
-        <WorkList items={sortedBuilds} size={19}/>
+        <WorkList items={sortedBuilds} size={19} onRead={setReading}/>
 
         <div className="lbl" style={{ margin:"10vh 0 32px" }}>Writing</div>
-        <WorkList items={sortedEssays} size={15}/>
+        <WorkList items={sortedEssays} size={15} onRead={setReading}/>
       </main>
+
+      <ReadingRoom essay={reading} onClose={()=>setReading(null)} />
 
       {/* ENERGY — a second square field, mirrored, hot "sun" palette. */}
       <section className="hero">
