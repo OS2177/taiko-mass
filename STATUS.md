@@ -52,3 +52,38 @@ Standalone Vite + React app. No backend, no env vars, no secrets — pure static
 
 ## Source of truth
 The **GitHub repo (`main`)** is authoritative. Reference `.jsx` files generated in chat may include experiments not in the live build — diff before deploying any of them over the repo.
+
+## Working setup — two representations of the same site (READ THIS)
+
+This project's source exists in TWO forms that must stay in sync:
+
+1. **Repo (source of truth):** `src/TaikoMassSite.jsx` + `src/content.js`.
+   This is the real, deployed app — a proper two-file split where content
+   (BUILDS, ESSAYS, sort logic) lives in content.js and the component
+   imports it. ALL committed/deployed changes happen here.
+
+2. **Preview file (chat-only, NOT in the repo):** a single self-contained
+   `TaikoMassSite_preview.jsx` used only to preview changes in the Claude
+   chat interface before they're applied to the repo. It inlines the
+   content back into one file because the chat preview can't resolve the
+   `./content` import. It is a disposable mirror, never deployed.
+
+**The workflow:** changes are previewed in the single-file version first,
+then translated into instructions applied to the repo's split files.
+
+**Divergence flag — IMPORTANT:** because the same code lives in two places,
+they can drift. Before acting on any change request:
+- Treat the REPO (TaikoMassSite.jsx + content.js) as authoritative. If a
+  preview file and the repo disagree, the repo wins.
+- If you are given a preview/single-file version to apply, do NOT paste it
+  in wholesale — port only the intended change into the split files, and
+  flag to me explicitly that the change came from the preview so I can
+  confirm nothing else diverged.
+- If you notice the repo's component logic no longer matches what a
+  preview or instruction assumes (e.g. different component structure,
+  missing props, renamed pieces), STOP and flag the divergence with a
+  short diff summary rather than guessing — ask me which version is
+  correct before changing anything.
+- content.js is the only place site content (builds/essays/dates/links/
+  thumbs) should be edited. If content appears hardcoded in the component
+  again, flag it — it belongs in content.js.
