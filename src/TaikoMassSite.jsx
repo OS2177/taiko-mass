@@ -1,11 +1,21 @@
 import React, { useState, useRef, useEffect } from "react";
-import { sortedBuilds, sortedEssays } from "./content";
+import { sortedBuilds, sortedEssays, FOOTER_LINKS } from "./content";
 
 // TAIKO MASS — the site.
 // Hero descends through three fields: A Fade → B Square → C Mass.
 // Energy forming into matter. Builds primary, essays secondary. Monospace only.
 
-const C = { void: "#06070b", ink:"#0b0d14", ash: "#7d8596", pale: "#c9cdd6", ember: "#d98a6a", mint: "#00e5a0" };
+// Theme palettes. Dark = original. Light matches the Stripe-blog reference:
+// warm near-white ground, near-black ink, hairline greys. In light mode the
+// hero field canvases render at reduced opacity so they blend on white.
+const THEMES = {
+  dark:  { void:"#06070b", ink:"#0b0d14", ash:"#7d8596", pale:"#c9cdd6", ember:"#d98a6a", mint:"#00e5a0",
+           rule:"rgba(125,133,150,0.14)", ruleHover:"rgba(217,138,106,0.5)", fieldOpacity:1, rrBg:"#faf8f5", rrInk:"#26262b", rrTitle:"#1a1a1a" },
+  light: { void:"#f7f7f6", ink:"#eeeeec", ash:"#6b6b6b", pale:"#1a1a1a", ember:"#c56a44", mint:"#0a9c6e",
+           rule:"rgba(30,30,30,0.12)", ruleHover:"rgba(197,106,68,0.5)", fieldOpacity:0.82, rrBg:"#faf8f5", rrInk:"#26262b", rrTitle:"#1a1a1a" },
+};
+// Default (dark) — non-theme-aware references still resolve to this.
+const C = THEMES.dark;
 
 function useMembrane(canvasRef) {
   const s = useRef({ tx: 0.5, ty: 0.45, x: 0.5, y: 0.45, t: 0, reduced: false });
@@ -32,13 +42,10 @@ function FieldFade() {
     const cv = ref.current, ctx = cv.getContext("2d"); let W,H,DPR,raf;
     const rs = () => { DPR=Math.min(devicePixelRatio||1,2); W=cv.clientWidth; H=cv.clientHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); };
     rs(); addEventListener("resize", rs);
-
-    // movement releases an expanding bloom; reach scales with cursor speed
     const blooms = [];
     const onMove = (e) => {
       const r=cv.getBoundingClientRect();
       const x=e.clientX-r.left, y=e.clientY-r.top; const L=last.current;
-      // ignore the cursor when it's outside this panel
       if(x<0||y<0||x>r.width||y>r.height){ L.has=false; return; }
       if(L.has){
         const dx=x-L.x, dy=y-L.y; const sp=Math.hypot(dx,dy);
@@ -50,10 +57,8 @@ function FieldFade() {
       L.x=x; L.y=y; L.has=true;
     };
     addEventListener("pointermove", onMove);
-
     const draw = () => {
       const st=s.current; st.t+=0.016;
-      // soft photographic dawn fade — blue top, warm peach-grey base (matches the photo)
       const g = ctx.createLinearGradient(0,0,0,H);
       g.addColorStop(0.00,"#9fb0c9");
       g.addColorStop(0.35,"#aeb6c0");
@@ -62,12 +67,10 @@ function FieldFade() {
       g.addColorStop(0.92,"#c79f9c");
       g.addColorStop(1.00,"#9a8e93");
       ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-
       ctx.globalCompositeOperation="lighter";
       for(let i=blooms.length-1;i>=0;i--){ const p=blooms[i];
-        // expand toward max, then fade
-        p.r += (p.max - p.r) * 0.08;   // easing expansion across the page
-        p.life -= 0.022;               // then dissipates
+        p.r += (p.max - p.r) * 0.08;
+        p.life -= 0.022;
         if(p.life<=0){ blooms.splice(i,1); continue; }
         const rg=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);
         const a=p.life*0.13;
@@ -126,9 +129,10 @@ const SQUARE_PALETTES = {
 };
 
 // ---------- B · SQUARE — haze bands that blend on movement, resettle on stillness ----------
-function FieldSquare({ palette = "dawn" }) {
+function FieldSquare({ palette = "dawn", fieldOpacity = 1, line = false }) {
   const ref = useRef(null); const s = useMembrane(ref);
-  const motion = useRef({ d: 0, lx: 0, ly: 0, has: false, phase: 0, vel: 0 });
+  // phase indexes ORDER = ["square","circle","triangle"]; start on the triangle (2)
+  const motion = useRef({ d: 0, lx: 0, ly: 0, has: false, phase: 2, vel: 0 });
   useEffect(() => {
     const PAL = SQUARE_PALETTES[palette] || SQUARE_PALETTES.dawn;
     const cv = ref.current, ctx = cv.getContext("2d"); let W,H,DPR,raf;
@@ -138,9 +142,7 @@ function FieldSquare({ palette = "dawn" }) {
     const rs = () => { DPR=Math.min(devicePixelRatio||1,2); W=cv.clientWidth; H=cv.clientHeight;
       cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0);
       buf.width=W; buf.height=H; paintBuffer(); };
-
     const upper = PAL.bands;
-
     // paint the settled banded field into the buffer (lower opacity = delicate sea)
     const paintBuffer = () => {
       const seamY=H*0.56, seamH=H*0.04, upH=seamY-seamH/2;
@@ -155,14 +157,19 @@ function FieldSquare({ palette = "dawn" }) {
         bx.fillStyle=band(y,bh,b.c2,b.c1); bx.fillRect(0,y,W,bh+1);
         bx.fillStyle="rgba(6,5,11,0.42)"; bx.fillRect(0,y,W,bh+1); y+=bh; }
       bx.globalAlpha=1;
-      // fading seam
       const sg=bx.createLinearGradient(0,seamY-seamH*1.8,0,seamY+seamH*1.8);
       sg.addColorStop(0,PAL.seam[0]); sg.addColorStop(0.5,PAL.seam[1]); sg.addColorStop(1,PAL.seam[2]);
       bx.fillStyle=sg; bx.fillRect(0,seamY-seamH*1.8,W,seamH*3.6);
     };
-
     rs(); addEventListener("resize", rs);
-
+    // in-app browsers (link previews) don't reliably fire window 'resize' after
+    // late layout, leaving the canvas measured at the wrong size → distorted field.
+    // A ResizeObserver re-measures whenever the element's own box changes.
+    let ro;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(() => { if (cv.clientWidth && cv.clientHeight) rs(); });
+      ro.observe(cv);
+    }
     const onMove = (e) => {
       const r=cv.getBoundingClientRect();
       const x=e.clientX-r.left, y=e.clientY-r.top; const m=motion.current;
@@ -174,7 +181,6 @@ function FieldSquare({ palette = "dawn" }) {
       m.lx=x; m.ly=y; m.has=true;
     };
     addEventListener("pointermove", onMove);
-
     // morph helper: returns N points for square/circle/triangle, then blends them
     const NPTS = 96;
     const shapePoints = (kind, cx, cy, rad) => {
@@ -185,7 +191,6 @@ function FieldSquare({ palette = "dawn" }) {
         if(kind==="circle"){
           const a=u*Math.PI*2 - Math.PI/2; x=cx+Math.cos(a)*rad; y=cy+Math.sin(a)*rad;
         } else if(kind==="square"){
-          // walk the 4 sides
           const s=u*4, side=Math.floor(s), f=s-side; const r=rad;
           if(side===0){ x=cx-r+2*r*f; y=cy-r; }
           else if(side===1){ x=cx+r; y=cy-r+2*r*f; }
@@ -203,7 +208,6 @@ function FieldSquare({ palette = "dawn" }) {
     };
     const lerpShapes = (A,B,t)=>A.map((p,i)=>[p[0]+(B[i][0]-p[0])*t, p[1]+(B[i][1]-p[1])*t]);
     const ORDER=["square","circle","triangle"]; // cycle, loops back to square
-
     const draw = () => {
       const st=s.current; st.t+=0.016; const m=motion.current;
       if(!st.reduced){
@@ -219,51 +223,72 @@ function FieldSquare({ palette = "dawn" }) {
           let diff = target - cur;
           if(diff > 1.5) diff -= 3;
           if(diff < -1.5) diff += 3;
-          // exponential ease — approaches target asymptotically, no jump
           m.phase = (cur + diff * 0.08 + 3) % 3;
         }
       }
       ctx.clearRect(0,0,W,H);
-      ctx.drawImage(buf,-40,-40,W+80,H+80);
-
       const seamY=H*0.5, seamH=H*0.04, rad=Math.min(W,H)*0.21;
       const cx=W/2, cy=H*0.5; // dead center
       const refSeam = cy + rad + H*0.02; // fold sits just below the form
-
       const seg=Math.floor(m.phase), f=m.phase-seg;
       const ease=f<0.5 ? 2*f*f : 1-Math.pow(-2*f+2,2)/2;
       const cur=shapePoints(ORDER[seg%3], cx, cy, rad);
       const nxt=shapePoints(ORDER[(seg+1)%3], cx, cy, rad);
       const shape=lerpShapes(cur,nxt,ease);
-
       const drawPath=(g)=>{ g.beginPath(); g.moveTo(shape[0][0],shape[0][1]);
         for(let i=1;i<shape.length;i++) g.lineTo(shape[i][0],shape[i][1]); g.closePath(); };
 
-      // soft mirrored reflection below the seam
-      ctx.save(); ctx.globalAlpha=0.18;
-      const refShape=shape.map(p=>[p[0], refSeam + (refSeam-p[1])]);
-      ctx.beginPath(); ctx.moveTo(refShape[0][0],refShape[0][1]);
-      for(let i=1;i<refShape.length;i++) ctx.lineTo(refShape[i][0],refShape[i][1]); ctx.closePath();
-      const refg=ctx.createLinearGradient(0,refSeam,0,refSeam+rad*2);
-      refg.addColorStop(0,PAL.refTint[0]); refg.addColorStop(1,PAL.refTint[1]);
-      ctx.fillStyle=refg; ctx.fill();
-      ctx.restore();
-
-      // THE FORM — sun gradient from the image: golden top, soft fade into red
-      const pg=ctx.createLinearGradient(0,cy-rad,0,cy+rad);
-      for(const [stop,col] of PAL.form) pg.addColorStop(stop,col);
-      drawPath(ctx); ctx.fillStyle=pg; ctx.fill();
-      // hairline edge fades out as the form softens during morph
-      drawPath(ctx);
-      ctx.strokeStyle=`rgba(${PAL.edge}, ${0.45 * (1 - Math.min(1, m.vel*30))})`;
-      ctx.lineWidth=1; ctx.stroke();
-
+      if(line){
+        // LINE-ART MODE (light theme): fine grey strata lines + outlined shape,
+        // on transparent so the white page shows through. Matches the Stripe figure.
+        const ink = "40,40,44";
+        // horizontal strata — evenly spaced fine lines, denser toward the horizon
+        const lines = 26;
+        for(let i=0;i<lines;i++){
+          const t = i/(lines-1);
+          const y = t*H;
+          // fade toward top/bottom, strongest near the seam
+          const nearSeam = 1 - Math.min(1, Math.abs(y - seamY)/(H*0.5));
+          const a = 0.05 + nearSeam*0.10;
+          ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y);
+          ctx.strokeStyle=`rgba(${ink},${a})`; ctx.lineWidth=1; ctx.stroke();
+        }
+        // the dark horizon band as two slightly stronger lines
+        ctx.strokeStyle=`rgba(${ink},0.28)`; ctx.lineWidth=1;
+        ctx.beginPath(); ctx.moveTo(0,seamY-seamH/2); ctx.lineTo(W,seamY-seamH/2); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(0,seamY+seamH/2); ctx.lineTo(W,seamY+seamH/2); ctx.stroke();
+        // reflected outline (fainter, below the seam)
+        const refShape=shape.map(p=>[p[0], refSeam + (refSeam-p[1])]);
+        ctx.beginPath(); ctx.moveTo(refShape[0][0],refShape[0][1]);
+        for(let i=1;i<refShape.length;i++) ctx.lineTo(refShape[i][0],refShape[i][1]); ctx.closePath();
+        ctx.strokeStyle=`rgba(${ink},0.14)`; ctx.lineWidth=1; ctx.stroke();
+        // the morph shape as a clean stroked outline
+        drawPath(ctx);
+        ctx.strokeStyle=`rgba(${ink},0.7)`; ctx.lineWidth=1.4; ctx.stroke();
+      } else {
+        // FILLED MODE (dark theme): the original painted field
+        ctx.drawImage(buf,-40,-40,W+80,H+80);
+        ctx.save(); ctx.globalAlpha=0.18;
+        const refShape=shape.map(p=>[p[0], refSeam + (refSeam-p[1])]);
+        ctx.beginPath(); ctx.moveTo(refShape[0][0],refShape[0][1]);
+        for(let i=1;i<refShape.length;i++) ctx.lineTo(refShape[i][0],refShape[i][1]); ctx.closePath();
+        const refg=ctx.createLinearGradient(0,refSeam,0,refSeam+rad*2);
+        refg.addColorStop(0,PAL.refTint[0]); refg.addColorStop(1,PAL.refTint[1]);
+        ctx.fillStyle=refg; ctx.fill();
+        ctx.restore();
+        const pg=ctx.createLinearGradient(0,cy-rad,0,cy+rad);
+        for(const [stop,col] of PAL.form) pg.addColorStop(stop,col);
+        drawPath(ctx); ctx.fillStyle=pg; ctx.fill();
+        drawPath(ctx);
+        ctx.strokeStyle=`rgba(${PAL.edge}, ${0.45 * (1 - Math.min(1, m.vel*30))})`;
+        ctx.lineWidth=1; ctx.stroke();
+      }
       raf=requestAnimationFrame(draw);
     };
     draw();
-    return () => { cancelAnimationFrame(raf); removeEventListener("resize", rs); removeEventListener("pointermove", onMove); };
-  }, [palette]);
-  return <canvas ref={ref} style={{ width:"100%", height:"100%", display:"block" }} />;
+    return () => { cancelAnimationFrame(raf); removeEventListener("resize", rs); removeEventListener("pointermove", onMove); if(ro) ro.disconnect(); };
+  }, [palette, line]);
+  return <canvas ref={ref} style={{ width:"100%", height:"100%", display:"block", opacity:fieldOpacity, transition:"opacity .5s" }} />;
 }
 
 // ---------- C · MASS — layered filament sphere (smoke/fascia strata) ----------
@@ -273,9 +298,6 @@ function FieldMass() {
     const cv = ref.current, ctx = cv.getContext("2d"); let W,H,DPR,raf;
     const rs = () => { DPR=Math.min(devicePixelRatio||1,2); W=cv.clientWidth; H=cv.clientHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); };
     rs(); addEventListener("resize", rs);
-
-    // Build filament strands: chains of points in normalized sphere space,
-    // clustered into horizontal strata, denser at the equator (the layered look).
     const STRANDS = 220, SEG = 20;
     const strands = [];
     for(let i=0;i<STRANDS;i++){
@@ -294,7 +316,6 @@ function FieldMass() {
       strands.push({ pts, seed:Math.random()*6.28, spd:0.2+Math.random()*0.5,
         amp:0.012+Math.random()*0.03, bright:0.3+Math.random()*0.7 });
     }
-
     const draw = () => {
       const st=s.current; st.t+=0.016;
       st.x += (st.tx-st.x)*(st.reduced?0:0.015);
@@ -304,11 +325,9 @@ function FieldMass() {
       const mx=st.x*W, my=st.y*H, MR=Math.min(W,H)*0.5;
       const rot = st.reduced?0:st.t*0.02;
       const skew = Math.sin(rot)*0.05; // very subtle volumetric sway
-
       ctx.lineCap="round"; ctx.lineJoin="round";
       ctx.globalCompositeOperation="lighter";
       for(const str of strands){
-        // compute screen points; fade alpha near sphere boundary instead of dropping
         const sp=[]; let avgFade=0, n=0;
         for(let j=0;j<str.pts.length;j++){
           let [nx,ny]=str.pts[j];
@@ -317,7 +336,6 @@ function FieldMass() {
             ny += Math.cos(st.t*0.25*str.spd + str.seed + j*0.3)*str.amp*0.6;
           }
           const r=Math.sqrt(nx*nx+ny*ny);
-          // contain within a sphere: hard cutoff at the boundary, soft fade approaching it
           const fade = r>1 ? 0 : Math.min(1, (1-r)*3.0);
           let X = cx + nx*R + ny*skew*R;
           let Y = cy + ny*R;
@@ -328,8 +346,6 @@ function FieldMass() {
         }
         avgFade = n?avgFade/n:0;
         if(avgFade<0.02) continue;
-        // draw segment-by-segment so each fades by its own boundary distance —
-        // gives a clean spherical silhouette, strands cut exactly at the edge
         for(let j=1;j<sp.length;j++){
           const f = Math.min(sp[j-1][2], sp[j][2]);
           if(f<=0) continue;
@@ -341,11 +357,8 @@ function FieldMass() {
         }
       }
       ctx.globalCompositeOperation="source-over";
-
-      // faint spherical containment edge
       ctx.beginPath(); ctx.arc(cx,cy,R*1.04,0,6.28);
       ctx.strokeStyle="rgba(170,182,200,0.045)"; ctx.lineWidth=1; ctx.stroke();
-
       raf=requestAnimationFrame(draw);
     };
     draw();
@@ -387,7 +400,6 @@ function StillSquare(){
       const bg=ctx.createLinearGradient(0,y,0,y+bh);bg.addColorStop(0,c2);bg.addColorStop(1,c1);
       ctx.fillStyle=bg;ctx.fillRect(0,y,W,bh+1);ctx.fillStyle="rgba(6,5,11,0.42)";ctx.fillRect(0,y,W,bh+1);y+=bh; }
     ctx.globalAlpha=1;
-    // settled circle (a clean shape at rest), sun gradient
     const rad=Math.min(W,H)*0.21,cx=W/2,cy=H*0.5;
     const pg=ctx.createLinearGradient(0,cy-rad,0,cy+rad);
     pg.addColorStop(0,"rgba(255,206,64,0.92)");pg.addColorStop(0.3,"rgba(252,168,52,0.9)");
@@ -398,8 +410,6 @@ function StillSquare(){
   return <canvas ref={ref} style={{width:"100%",height:"100%",display:"block"}}/>;
 }
 function StillMass(){
-  // reuse the live mass but it will be replaced by full Comp on hover; a calm
-  // single-frame approximation keeps the resting state quiet.
   const ref=useRef(null);
   useEffect(()=>{ const cv=ref.current,ctx=cv.getContext("2d");
     const DPR=Math.min(devicePixelRatio||1,2); const W=cv.clientWidth,H=cv.clientHeight;
@@ -425,7 +435,7 @@ function StillMass(){
 }
 
 // ---------- Builds / Writing — click-to-expand accordion ----------
-function WorkRow({ item, size, open, onOpen, onClose, onRead }){
+function WorkRow({ item, size, open, onOpen, onClose, onRead, T=THEMES.dark }){
   const hasUrl = item.url && item.url !== "#";
   const toggle = ()=> onOpen(open ? null : item._key);
   return (
@@ -433,18 +443,18 @@ function WorkRow({ item, size, open, onOpen, onClose, onRead }){
       <div className="row" role="button" tabIndex={0}
         onClick={toggle}
         onKeyDown={(e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); } }}>
-        <span className="ttl" style={{ fontSize:size, color:C.pale }}>{item.title}</span>
-        <span style={{ flex:1, color:C.ash, fontSize:12 }}>{item.note}</span>
+        <span className="ttl" style={{ fontSize:size, color:T.pale }}><GlitchText>{item.title}</GlitchText></span>
+        <span style={{ flex:1, color:T.ash, fontSize:12 }}>{item.note}</span>
         {item.status && (
-          <span className="lbl" style={{ color: item.status==="Live" ? C.mint : undefined }}>{item.status}</span>
+          <span className="lbl" style={{ color: item.status==="Live" ? T.mint : undefined }}>{item.status}</span>
         )}
         <span className="arr" style={{ fontSize:14, transform: open ? "rotate(90deg)" : "rotate(0deg)" }}>→</span>
       </div>
       <div className={open ? "preview" : "preview closing"} style={{ maxHeight: open ? 260 : 0 }}>
         <div className="preview-inner">
-          {!item.body && (
+          {!item.body && !item.page && (
             <div className="preview-thumb">
-              <span className="lbl" style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", color:C.ash, textAlign:"center", padding:"0 12px" }}>{item.title}</span>
+              <span className="lbl" style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", color:T.ash, textAlign:"center", padding:"0 12px" }}>{item.title}</span>
               {item.thumb && (
                 <img src={item.thumb} alt={item.title}
                   style={{ position:"relative", width:"100%", height:"100%", objectFit:"contain" }}
@@ -453,16 +463,19 @@ function WorkRow({ item, size, open, onOpen, onClose, onRead }){
             </div>
           )}
           <div className="preview-body">
-            <p style={{ margin:0, color:C.pale, fontSize:13, lineHeight:1.65 }}>{item.blurb}</p>
+            <p style={{ margin:0, color:T.pale, fontSize:13, lineHeight:1.65 }}>{item.blurb}</p>
             <div style={{ display:"flex", gap:20, alignItems:"center" }}>
-              {item.body && (
+              {item.page && (
+                <a className="visit" href={item.page}>Read ↗</a>
+              )}
+              {!item.page && item.body && (
                 <button className="visit" onClick={()=>onRead(item)}
                   style={{ background:"none", border:"none", cursor:"pointer", padding:"6px 0" }}>Read ↗</button>
               )}
-              {!item.body && hasUrl && (
+              {!item.page && !item.body && hasUrl && (
                 <a className="visit" href={item.url} target="_blank" rel="noopener">Visit ↗</a>
               )}
-              {!item.body && !hasUrl && (
+              {!item.page && !item.body && !hasUrl && (
                 <span className="visit" style={{ opacity:0.5 }}>Coming soon</span>
               )}
             </div>
@@ -473,7 +486,7 @@ function WorkRow({ item, size, open, onOpen, onClose, onRead }){
   );
 }
 
-function WorkList({ items, size, onRead }){
+function WorkList({ items, size, onRead, T=THEMES.dark }){
   const [openKey, setOpenKey] = useState(null);
   const timer = useRef(null);
   const setOpen = (key)=>{ clearTimeout(timer.current); setOpenKey(key); };
@@ -484,7 +497,7 @@ function WorkList({ items, size, onRead }){
       {items.map((item,i)=>{
         const key = item.title + i;
         item._key = key;
-        return <WorkRow key={key} item={item} size={size} open={openKey===key} onOpen={setOpen} onClose={closeSoon} onRead={onRead} />;
+        return <WorkRow key={key} item={item} size={size} open={openKey===key} onOpen={setOpen} onClose={closeSoon} onRead={onRead} T={T} />;
       })}
     </div>
   );
@@ -512,7 +525,7 @@ function Markdown({ text }){
   });
 }
 
-function ReadingRoom({ essay, onClose }){
+function ReadingRoom({ essay, onClose, T=THEMES.dark }){
   useEffect(()=>{
     if(!essay) return;
     const onKey = (e)=>{ if(e.key==="Escape") onClose(); };
@@ -541,73 +554,226 @@ function ReadingRoom({ essay, onClose }){
   );
 }
 
+// Scramble/decode flicker on hover — letters cycle through glitch glyphs then
+// resettle to the SAME text (for build/essay titles). Same char effect as the wordmark.
+function GlitchText({ children, style, className }){
+  const target = typeof children === "string" ? children : "";
+  const [text, setText] = useState(target);
+  const [on, setOn] = useState(false);
+  const raf = useRef(null);
+  const frame = useRef(0);
+  useEffect(()=>{ setText(target); }, [target]);
+
+  const scramble = () => {
+    cancelAnimationFrame(raf.current);
+    setOn(true);
+    const queue = [];
+    for (let i = 0; i < target.length; i++){
+      const start = Math.floor(Math.random() * 8);
+      const end = start + Math.floor(Math.random() * 12) + 5;
+      queue.push({ ch: target[i], start, end, g: "" });
+    }
+    frame.current = 0;
+    const run = () => {
+      let out = "", done = 0;
+      for (const q of queue){
+        if (frame.current >= q.end){ done++; out += q.ch; }
+        else if (frame.current >= q.start){
+          if (q.ch === " ") { out += " "; done++; }
+          else { if (!q.g || Math.random() < 0.3) q.g = GLYPHS[Math.floor(Math.random()*GLYPHS.length)]; out += q.g; }
+        } else out += q.ch;
+      }
+      setText(out);
+      if (done >= queue.length){ setText(target); setOn(false); return; }
+      frame.current++;
+      raf.current = requestAnimationFrame(run);
+    };
+    run();
+  };
+  useEffect(()=>()=>cancelAnimationFrame(raf.current), []);
+
+  return (
+    <span
+      className={className}
+      style={{ ...style, position:"relative", display:"inline-block", whiteSpace:"nowrap" }}
+      onMouseEnter={scramble}
+    >
+      <span className={on ? "glitch-rgb" : ""} data-text={text}>{text}</span>
+    </span>
+  );
+}
+
+// ---------- Glitch wordmark: "Taiko Mass" ⇄ "Jack Vintage" on hover ----------
+const GLITCH_A = "Taiko Mass";
+const GLITCH_B = "Jack Vintage";
+const GLYPHS = "!<>-_\\/[]{}—=+*^?#________";
+// How much longer the return scramble (Jack Vintage → Taiko Mass) runs vs the
+// flip out. 2× then increased by a third → 8/3 ≈ 2.67.
+const RETURN_SCALE = 8 / 3;
+
+function GlitchWordmark({ variant = "rgb", style, className }) {
+  const [text, setText] = useState(GLITCH_A);
+  const [glitching, setGlitching] = useState(false);
+  const raf = useRef(null);
+  const frame = useRef(0);
+
+  // scale stretches the whole scramble (start stagger + per-char span); the
+  // return to "Taiko Mass" passes scale=2 to run twice as long as the flip out.
+  const scrambleTo = (from, to, scale = 1) => {
+    cancelAnimationFrame(raf.current);
+    const len = Math.max(from.length, to.length);
+    const queue = [];
+    for (let i = 0; i < len; i++) {
+      const start = Math.floor(Math.random() * 5) * scale;
+      const end = start + (Math.floor(Math.random() * 7) + 5) * scale; // +1 frame (~17ms) longer base
+      queue.push({ fromCh: from[i] || "", toCh: to[i] || "", start, end, ch: "" });
+    }
+    frame.current = 0;
+    setGlitching(true);
+    const run = () => {
+      let out = "", done = 0;
+      for (const q of queue) {
+        if (frame.current >= q.end) { done++; out += q.toCh; }
+        else if (frame.current >= q.start) {
+          if (q.toCh === " " && q.fromCh === " ") { out += " "; }
+          else { if (!q.ch || Math.random() < 0.28) q.ch = GLYPHS[Math.floor(Math.random() * GLYPHS.length)]; out += q.ch; }
+        } else out += q.fromCh;
+      }
+      setText(out);
+      if (done === queue.length) { setText(to); setGlitching(false); return; }
+      frame.current++;
+      raf.current = requestAnimationFrame(run);
+    };
+    run();
+  };
+
+  const hovering = useRef(false);
+
+  useEffect(() => () => cancelAnimationFrame(raf.current), []);
+
+  // Auto-blip: flash to "Jack Vintage" for 800ms, settle back to "Taiko Mass",
+  // then wait 10s before the next one. Skipped while hovered so the pointer
+  // stays in control and the two never collide.
+  useEffect(() => {
+    let timers = [];
+    const cycle = () => {
+      if (!hovering.current) scrambleTo(GLITCH_A, GLITCH_B);
+      timers.push(setTimeout(() => {
+        if (!hovering.current) scrambleTo(GLITCH_B, GLITCH_A, RETURN_SCALE);
+        timers.push(setTimeout(cycle, 10000));
+      }, 800));
+    };
+    timers.push(setTimeout(cycle, 10000));
+    return () => timers.forEach(clearTimeout);
+  }, []);
+
+  return (
+    <span
+      className={className}
+      style={{ position:"relative", display:"inline-block", cursor:"default", whiteSpace:"nowrap", ...style }}
+      onMouseEnter={() => scrambleTo(GLITCH_A, GLITCH_B)}
+      onMouseLeave={() => scrambleTo(GLITCH_B, GLITCH_A, RETURN_SCALE)}
+      data-text={text}
+    >
+      <span className={variant === "rgb" && glitching ? "glitch-rgb" : ""} data-text={text}>{text}</span>
+    </span>
+  );
+}
+
 export default function TaikoMassSite() {
   const [reading, setReading] = useState(null);
+  // Persist the theme choice across visits. A stored choice always wins; on a
+  // first visit with nothing stored, default to dark at night (local time 20:00
+  // through 06:59), otherwise light.
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem("tm-theme");
+    if (saved) return saved;
+    const hour = new Date().getHours();
+    return (hour >= 20 || hour < 7) ? "dark" : "light";
+  });
+  useEffect(() => { localStorage.setItem("tm-theme", theme); }, [theme]);
+  const T = THEMES[theme];
+  const isLight = theme === "light";
   return (
-    <div style={{ background:C.void, color:C.pale, fontFamily:"'Space Mono', monospace" }}>
+    <div style={{ background:T.void, color:T.pale, fontFamily:"'Space Mono', monospace", transition:"background .5s,color .5s" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
-        *{box-sizing:border-box;} body{margin:0;background:#06070b;}
+        *{box-sizing:border-box;} body{margin:0;background:${T.void};transition:background .5s;}
         html{scroll-behavior:smooth;}
         a{color:inherit;text-decoration:none;}
-        .lbl{letter-spacing:0.32em;text-transform:uppercase;font-size:10px;color:${C.ash};}
-        .row{border-top:1px solid rgba(125,133,150,0.14);padding:26px 0;display:flex;justify-content:space-between;align-items:baseline;gap:24px;transition:border-color .5s,padding-left .4s;cursor:pointer;}
-        .row:hover{border-color:rgba(217,138,106,0.5);padding-left:18px;}
-        .row:hover .ttl{color:${C.ember};}
+        .lbl{letter-spacing:0.32em;text-transform:uppercase;font-size:10px;color:${T.ash};}
+        .row{border-top:1px solid ${T.rule};padding:26px 0;display:flex;justify-content:space-between;align-items:baseline;gap:24px;transition:border-color .5s,padding-left .4s;cursor:pointer;}
+        .row:hover{border-color:${T.ruleHover};padding-left:18px;}
+        .row:hover .ttl{color:${T.ember};}
         .row:hover .arr{opacity:1;}
         .ttl{transition:color .5s;}
-        .arr{opacity:0.5;transition:transform .4s cubic-bezier(0.16,1,0.3,1),opacity .4s,color .4s;color:${C.ember};}
+        .arr{opacity:0.5;transition:transform .4s cubic-bezier(0.16,1,0.3,1),opacity .4s,color .4s;color:${T.ember};}
         .preview{overflow:hidden;max-height:0;transition:max-height .8s cubic-bezier(0.22,0.61,0.36,1);}
         .preview.closing{transition:max-height .55s cubic-bezier(0.16,1,0.3,1);}
         .preview-inner{display:flex;gap:24px;padding:4px 0 30px;}
-        .preview-thumb{position:relative;flex:0 0 240px;height:150px;border:1px solid rgba(125,133,150,0.18);border-radius:2px;overflow:hidden;background:rgba(125,133,150,0.06);}
+        .preview-thumb{position:relative;flex:0 0 240px;height:150px;border:1px solid ${T.rule};border-radius:2px;overflow:hidden;background:${isLight?"rgba(30,30,30,0.04)":"rgba(125,133,150,0.06)"};}
         .preview-body{flex:1;display:flex;flex-direction:column;gap:14px;}
-        .visit{display:inline-block;color:${C.ember};padding:6px 0;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;transition:opacity .3s,letter-spacing .3s;}
+        .visit{display:inline-block;color:${T.ember};padding:6px 0;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;transition:opacity .3s,letter-spacing .3s;}
         .visit:hover{opacity:0.7;letter-spacing:0.24em;}
         @media(max-width:680px){.preview-inner{flex-direction:column;}.preview-thumb{flex:0 0 auto;width:100%;}}
-        .rr-scroll{position:fixed;inset:0;z-index:10000;overflow-y:auto;-webkit-overflow-scrolling:touch;background:#faf8f5;}
+        .rr-scroll{position:fixed;inset:0;z-index:10000;overflow-y:auto;-webkit-overflow-scrolling:touch;background:${T.rrBg};}
         .rr-bg{display:none;} .rr-scrim{display:none;}
         .rr-close{position:fixed;top:24px;right:28px;z-index:3;background:none;border:none;color:#9a9aa0;font-size:20px;cursor:pointer;line-height:1;transition:color .3s,transform .3s;}
-        .rr-close:hover{color:#d98a6a;transform:rotate(90deg);}
+        .rr-close:hover{color:${T.ember};transform:rotate(90deg);}
         .rr-fade{position:relative;z-index:2;animation:rrFade .5s cubic-bezier(0.22,0.61,0.36,1);}
         @keyframes rrFade{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
         .rr-col{position:relative;max-width:660px;margin:0 auto;padding:14vh 28px 20vh;}
-        .rr-title{font-family:'Space Mono',monospace;color:#1a1a1a;font-size:29px;line-height:1.25;letter-spacing:0.01em;margin:0 0 14px;font-weight:700;}
-        .rr-h2{font-family:'Space Mono',monospace;color:#d98a6a;font-size:12px;letter-spacing:0.3em;text-transform:uppercase;margin:54px 0 18px;font-weight:700;}
-        .rr-p{font-family:'Space Mono',monospace;color:#26262b;font-size:15px;line-height:1.9;margin:0 0 22px;}
-        .rr-quote{font-family:'Space Mono',monospace;color:#1a1a1a;font-size:16px;line-height:1.7;border-left:2px solid #d98a6a;padding-left:22px;margin:30px 0;}
+        .rr-title{font-family:'Space Mono',monospace;color:${T.rrTitle};font-size:29px;line-height:1.25;letter-spacing:0.01em;margin:0 0 14px;font-weight:700;}
+        .rr-h2{font-family:'Space Mono',monospace;color:${T.ember};font-size:12px;letter-spacing:0.3em;text-transform:uppercase;margin:54px 0 18px;font-weight:700;}
+        .rr-p{font-family:'Space Mono',monospace;color:${T.rrInk};font-size:15px;line-height:1.9;margin:0 0 22px;}
+        .rr-quote{font-family:'Space Mono',monospace;color:${T.rrTitle};font-size:16px;line-height:1.7;border-left:2px solid ${T.ember};padding-left:22px;margin:30px 0;}
         @media(max-width:680px){.rr-col{padding:12vh 22px 16vh;}.rr-title{font-size:22px;}.rr-p{font-size:14px;}}
         .panel{position:relative;flex:1;overflow:hidden;}
-        :focus-visible{outline:1px solid ${C.ember};outline-offset:4px;}
+        :focus-visible{outline:1px solid ${T.ember};outline-offset:4px;}
         /* hero: a centered square field, edge-to-edge canvas */
         .hero3{display:flex;width:100%;max-width:880px;aspect-ratio:1/1;margin:0 auto;}
+        .theme-toggle{position:fixed;bottom:22px;right:24px;z-index:9998;background:none;border:1px solid ${T.rule};border-radius:2px;color:${T.ash};font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;padding:7px 12px;cursor:pointer;transition:color .3s,border-color .3s;}
+        .theme-toggle:hover{color:${T.ember};border-color:${T.ruleHover};}
+        /* RGB-split static glitch for the footer wordmark */
+        .glitch-rgb{position:relative;display:inline-block;}
+        .glitch-rgb::before,.glitch-rgb::after{content:attr(data-text);position:absolute;left:0;top:0;width:100%;overflow:hidden;}
+        .glitch-rgb::before{color:#ff2f6e;animation:glitchA .18s steps(2) infinite;}
+        .glitch-rgb::after{color:#2fd4ff;animation:glitchB .21s steps(2) infinite;}
+        @keyframes glitchA{0%{transform:translate(-1.5px,0.5px);clip-path:inset(0 0 55% 0);}50%{transform:translate(1.5px,-0.5px);clip-path:inset(45% 0 0 0);}100%{transform:translate(-1px,0);clip-path:inset(20% 0 30% 0);}}
+        @keyframes glitchB{0%{transform:translate(1.5px,-0.5px);clip-path:inset(60% 0 0 0);}50%{transform:translate(-1.5px,0.5px);clip-path:inset(0 0 50% 0);}100%{transform:translate(1px,0);clip-path:inset(30% 0 20% 0);}}
         @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto;}}
       `}</style>
 
-      {/* warm tint — fixed overlay across the whole page */}
-      <div style={{ position:"fixed", inset:0, pointerEvents:"none", zIndex:9999, background:"#ff8a3d", mixBlendMode:"overlay", opacity:0.22 }} />
+      {/* warm tint — only in dark mode; on white it would muddy the page */}
+      {!isLight && <div style={{ position:"fixed", inset:0, pointerEvents:"none", zIndex:9999, background:"#ff8a3d", mixBlendMode:"overlay", opacity:0.22 }} />}
+
+      {/* dark ↔ light toggle */}
+      <button className="theme-toggle" onClick={()=>setTheme(isLight?"dark":"light")}>
+        {isLight ? "☾ Dark" : "☀ Light"}
+      </button>
 
       {/* HERO — the Matter field, constrained to the content column (maxWidth 880, 40px gutters). */}
       <section className="hero" style={{ overflow:"hidden", padding:"0" }}>
         <div className="hero3">
           {/* .panel is position:relative — the square field box the labels pin to */}
           <div className="panel">
-            <FieldSquare />
-            <div className="lbl" style={{ position:"absolute", top:28, left:40, color:C.ember, pointerEvents:"none" }}>Taiko&nbsp;Mass</div>
+            <FieldSquare fieldOpacity={isLight?1:T.fieldOpacity} line={isLight} />
+            <GlitchWordmark variant="rgb" className="lbl" style={{ position:"absolute", top:28, left:40, color:T.ember }} />
+            <div className="lbl" style={{ position:"absolute", top:28, right:40, color:T.ash, pointerEvents:"none" }}>iAOS21</div>
           </div>
         </div>
       </section>
 
       {/* WORKS */}
-      <main style={{ maxWidth:880, margin:"0 auto", padding:"12vh 40px 14vh", position:"relative", background:C.void }}>
+      <main style={{ maxWidth:880, margin:"0 auto", padding:"12vh 40px 14vh", position:"relative", background:T.void, transition:"background .5s" }}>
         <div className="lbl" style={{ marginBottom:32 }}>Builds</div>
-        <WorkList items={sortedBuilds} size={19} onRead={setReading}/>
+        <WorkList items={sortedBuilds} size={19} onRead={setReading} T={T}/>
 
         <div className="lbl" style={{ margin:"10vh 0 32px" }}>Writing</div>
-        <WorkList items={sortedEssays} size={15} onRead={setReading}/>
+        <WorkList items={sortedEssays} size={15} onRead={setReading} T={T}/>
       </main>
 
-      <ReadingRoom essay={reading} onClose={()=>setReading(null)} />
+      <ReadingRoom essay={reading} onClose={()=>setReading(null)} T={T} />
 
       {/* ENERGY — a second square field, mirrored, hot "sun" palette. */}
       <section className="hero">
@@ -615,12 +781,25 @@ export default function TaikoMassSite() {
           <div className="panel">
             {/* flipped wrapper mirrors the field; label sits outside so text stays upright */}
             <div style={{ width:"100%", height:"100%", transform:"scaleY(-1)" }}>
-              <FieldSquare palette="sun" />
+              <FieldSquare palette="sun" fieldOpacity={isLight?1:T.fieldOpacity} line={isLight} />
             </div>
-            <div className="lbl" style={{ position:"absolute", top:28, left:40, color:C.ember, pointerEvents:"none" }}>Taiko&nbsp;Mass</div>
+            <GlitchWordmark variant="rgb" className="lbl" style={{ position:"absolute", top:28, left:40, color:T.ember }} />
+            <div className="lbl" style={{ position:"absolute", top:28, right:40, color:T.ash, pointerEvents:"none" }}>iAOS21</div>
           </div>
         </div>
       </section>
+
+      {/* FOOTER */}
+      <footer style={{ maxWidth:880, margin:"0 auto", padding:"8vh 40px 10vh" }}>
+        <div style={{ borderTop:`1px solid ${T.rule}`, paddingTop:32, display:"flex", flexWrap:"wrap", gap:24, alignItems:"baseline", justifyContent:"space-between" }}>
+          <GlitchWordmark variant="rgb" className="lbl" style={{ color:T.ember }} />
+          <nav style={{ display:"flex", gap:28, flexWrap:"wrap" }}>
+            {FOOTER_LINKS.map((l,i)=>(
+              <a key={i} className="visit" href={l.url} target="_blank" rel="noopener">{l.label}&nbsp;↗</a>
+            ))}
+          </nav>
+        </div>
+      </footer>
     </div>
   );
 }

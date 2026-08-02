@@ -1,0 +1,227 @@
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* Colours lifted from THEMES in TaikoMassSite.jsx so the page wears the same
+   skin as the site it belongs to. Dark is the base; light overrides below. */
+:root {
+  --void: #06070b;
+  --ink: #c9cdd6;
+  --muted: #7d8596;
+  --ember: #d98a6a;
+  --rule: rgba(125,133,150,0.14);
+  --ruleHover: rgba(217,138,106,0.5);
+  /* strata ink — the fine horizontal lines of the hero field */
+  --strata: rgba(201,205,214,0.11);
+  --strata-strong: rgba(201,205,214,0.26);
+  /* The band. The hero panel is 880 square with 26 strata lines across it —
+     a 35.2px rhythm — rounded to a whole 35px here. The fraction made some
+     lines straddle two device rows and render darker or thicker than their
+     neighbours; a whole number keeps every line identical. The essay sits
+     on that rhythm: one line of text per band, every vertical margin a
+     whole number of bands, so the text rides the strata like ruled paper. */
+  --line: 35px;
+}
+html[data-theme="light"] {
+  --void: #f7f7f6;
+  --ink: #1a1a1a;
+  --muted: #6b6b6b;
+  --ember: #c56a44;
+  --rule: rgba(30,30,30,0.12);
+  --ruleHover: rgba(197,106,68,0.5);
+  --strata: rgba(40,40,44,0.11);
+  --strata-strong: rgba(40,40,44,0.26);
+}
+
+html {
+  background: var(--void);
+  color: var(--ink);
+}
+
+body {
+  font-family: 'Space Mono', monospace;
+  font-weight: 400;
+  font-size: 15px;
+  line-height: var(--line);
+  background: var(--void);
+}
+
+/* The hero panel — same 880 square column the field canvas occupies on the
+   home page. The strata ruling has been taken off; the text still keeps the
+   panel's rhythm, one line of text per band. */
+.panel {
+  position: relative;
+  max-width: 880px;
+  min-height: 100vh;
+  margin: 0 auto;
+  padding: 0 40px calc(var(--line) * 4);
+}
+
+/* Wordmark / iAOS21 — pinned exactly where the hero pins them: 28 from the
+   top, 40 in from each edge of the panel. */
+.site-nav {
+  position: absolute;
+  top: 28px;
+  left: 40px;
+  right: 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 24px;
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+}
+.site-nav .wordmark { color: var(--ember); text-decoration: none; white-space: nowrap; }
+.site-nav .iaos { color: var(--muted); }
+
+/* Glitch wordmark — same RGB split the main site uses while scrambling */
+.gw { position: relative; display: inline-block; white-space: nowrap; }
+.glitch-rgb { position: relative; display: inline-block; }
+.glitch-rgb::before, .glitch-rgb::after {
+  content: attr(data-text); position: absolute; left: 0; top: 0; width: 100%; overflow: hidden;
+}
+.glitch-rgb::before { color: #ff2f6e; animation: glitchA .18s steps(2) infinite; }
+.glitch-rgb::after  { color: #2fd4ff; animation: glitchB .21s steps(2) infinite; }
+@keyframes glitchA{0%{transform:translate(-1.5px,0.5px);clip-path:inset(0 0 55% 0);}50%{transform:translate(1.5px,-0.5px);clip-path:inset(45% 0 0 0);}100%{transform:translate(-1px,0);clip-path:inset(20% 0 30% 0);}}
+@keyframes glitchB{0%{transform:translate(1.5px,-0.5px);clip-path:inset(60% 0 0 0);}50%{transform:translate(-1.5px,0.5px);clip-path:inset(0 0 50% 0);}100%{transform:translate(1px,0);clip-path:inset(30% 0 20% 0);}}
+
+/* Theme toggle — lifted from .theme-toggle on the main site */
+.theme-toggle {
+  position: fixed; bottom: 22px; right: 24px; z-index: 9998;
+  background: none; border: 1px solid var(--rule); border-radius: 2px;
+  color: var(--muted); font-family: 'Space Mono', monospace;
+  font-size: 10px; letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 7px 12px; cursor: pointer; transition: color .3s, border-color .3s;
+}
+.theme-toggle:hover { color: var(--ember); border-color: var(--ruleHover); }
+
+/* Warm tint — dark mode only, exactly as the home page does it */
+.tint {
+  position: fixed; inset: 0; pointer-events: none; z-index: 9999;
+  background: #ff8a3d; mix-blend-mode: overlay; opacity: 0.22;
+}
+html[data-theme="light"] .tint { display: none; }
+
+/* The essay — centred in the panel where the morphing shape sits, riding
+   the same strata. Everything below uses line-height: one band, and every
+   vertical margin is a whole number of bands. A stray border or an odd
+   margin knocks the text off the strata for the rest of the page. */
+.sheet {
+  max-width: 620px;
+  margin: 0 auto;
+  padding-top: calc(var(--line) * 4);
+}
+
+.title-block { margin-bottom: var(--line); }
+
+h1 {
+  font-weight: 400;
+  font-size: 29px;
+  line-height: var(--line);
+  letter-spacing: 0.01em;
+  margin: 0;
+}
+
+.subtitle {
+  font-size: 10px;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  color: var(--muted);
+  line-height: var(--line);
+}
+
+/* Section break — for essays divided by rules rather than headings. One extra
+blank band between sections, so the grid still holds. */
+.sect + .sect { margin-top: calc(var(--line) * 2); }
+
+/* Section headers */
+h2 {
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--ink);
+  line-height: var(--line);
+  margin: calc(var(--line) * 2) 0 var(--line);
+}
+
+/* Paragraphs */
+p {
+  font-size: 15px;
+  line-height: var(--line);
+  margin-bottom: var(--line);
+}
+
+/* Single-line statements */
+.statement {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: var(--line);
+  margin-bottom: var(--line);
+}
+
+/* The core axiom — appears twice */
+.axiom {
+  font-size: 16px;
+  font-weight: 700;
+  line-height: var(--line);
+  margin: var(--line) 0;
+  padding-left: 22px;
+  border-left: 2px solid var(--ink);
+}
+
+/* Process arrow line */
+.process {
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  line-height: var(--line);
+  color: var(--ink);
+  margin: var(--line) 0;
+  padding: 0 0 0 22px;
+  border-left: 1px solid var(--strata-strong);
+}
+
+/* List items that read as beats */
+.beat-list { list-style: none; margin: 0 0 var(--line); padding: 0; }
+.beat-list li { font-size: 15px; line-height: var(--line); margin: 0; padding-left: 0; }
+
+/* Emphatic single lines */
+.emphatic {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--ink);
+  line-height: var(--line);
+  margin: var(--line) 0;
+}
+
+/* Closing */
+.closing {
+  margin-top: calc(var(--line) * 2);
+  font-size: 15px;
+  line-height: var(--line);
+}
+
+/* Home link — the main site's .visit treatment */
+.home-link {
+  display: inline-block;
+  margin-top: var(--line);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ember);
+  text-decoration: none;
+  line-height: var(--line);
+  transition: letter-spacing .3s, opacity .3s;
+}
+.home-link:hover { opacity: 0.7; letter-spacing: 0.24em; }
+
+/* Narrow screens — the band tightens with the type, so the grid still holds */
+@media (max-width: 700px) {
+  :root { --line: 28px; }
+  .panel { padding: 0 22px calc(var(--line) * 4); }
+  .site-nav { left: 22px; right: 22px; top: 22px; }
+  .sheet { padding-top: calc(var(--line) * 3); }
+  body { font-size: 14px; }
+  h1 { font-size: 22px; }
+  p, .statement, .beat-list li, .emphatic, .closing { font-size: 14px; }
+  .axiom { font-size: 15px; }
+}
