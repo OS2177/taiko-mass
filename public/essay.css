@@ -36,6 +36,10 @@ html {
   color: var(--ink);
 }
 
+/* Nothing may push the page sideways — on a phone that reads as the whole
+   page sliding around under the thumb. */
+html, body { overflow-x: hidden; max-width: 100%; }
+
 body {
   font-family: 'Space Mono', monospace;
   font-weight: 400;
@@ -108,7 +112,7 @@ html[data-theme="light"] .tint { display: none; }
 .sheet {
   max-width: 620px;
   margin: 0 auto;
-  padding-top: calc(var(--line) * 4);
+  padding-top: calc(var(--line) * 4 + 60px);
 }
 
 .title-block { margin-bottom: var(--line); }
@@ -219,7 +223,7 @@ p {
   :root { --line: 28px; }
   .panel { padding: 0 22px calc(var(--line) * 4); }
   .site-nav { left: 22px; right: 22px; top: 22px; }
-  .sheet { padding-top: calc(var(--line) * 3); }
+  .sheet { padding-top: calc(var(--line) * 3 + 60px); }
   body { font-size: 14px; }
   h1 { font-size: 22px; }
   p, .statement, .beat-list li, .emphatic, .closing { font-size: 14px; }

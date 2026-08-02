@@ -444,7 +444,7 @@ function WorkRow({ item, size, open, onOpen, onClose, onRead, T=THEMES.dark }){
         onClick={toggle}
         onKeyDown={(e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); } }}>
         <span className="ttl" style={{ fontSize:size, color:T.pale }}><GlitchText>{item.title}</GlitchText></span>
-        <span style={{ flex:1, color:T.ash, fontSize:12 }}>{item.note}</span>
+        <span className="note" style={{ color:T.ash, fontSize:12 }}>{item.note}</span>
         {item.status && (
           <span className="lbl" style={{ color: item.status==="Live" ? T.mint : undefined }}>{item.status}</span>
         )}
@@ -699,6 +699,9 @@ export default function TaikoMassSite() {
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap');
         *{box-sizing:border-box;} body{margin:0;background:${T.void};transition:background .5s;}
+        /* Nothing may push the page sideways — on a phone that reads as the
+           whole page sliding around under the thumb. */
+        html,body{overflow-x:hidden;max-width:100%;}
         html{scroll-behavior:smooth;}
         a{color:inherit;text-decoration:none;}
         .lbl{letter-spacing:0.32em;text-transform:uppercase;font-size:10px;color:${T.ash};}
@@ -707,6 +710,7 @@ export default function TaikoMassSite() {
         .row:hover .ttl{color:${T.ember};}
         .row:hover .arr{opacity:1;}
         .ttl{transition:color .5s;}
+        .note{flex:1;}
         .arr{opacity:0.5;transition:transform .4s cubic-bezier(0.16,1,0.3,1),opacity .4s,color .4s;color:${T.ember};}
         .preview{overflow:hidden;max-height:0;transition:max-height .8s cubic-bezier(0.22,0.61,0.36,1);}
         .preview.closing{transition:max-height .55s cubic-bezier(0.16,1,0.3,1);}
@@ -716,6 +720,16 @@ export default function TaikoMassSite() {
         .visit{display:inline-block;color:${T.ember};padding:6px 0;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;transition:opacity .3s,letter-spacing .3s;}
         .visit:hover{opacity:0.7;letter-spacing:0.24em;}
         @media(max-width:680px){.preview-inner{flex-direction:column;}.preview-thumb{flex:0 0 auto;width:100%;}}
+        /* Narrow screens: title, status and arrow hold the first line; the
+           description drops underneath the title instead of being squeezed
+           between them (which used to overflow the viewport). */
+        @media(max-width:600px){
+          .row{flex-wrap:wrap;}
+          .row .ttl{order:1;}
+          .row .lbl{order:2;}
+          .row .arr{order:3;}
+          .row .note{order:4;flex:0 0 100%;margin-top:6px;}
+        }
         .rr-scroll{position:fixed;inset:0;z-index:10000;overflow-y:auto;-webkit-overflow-scrolling:touch;background:${T.rrBg};}
         .rr-bg{display:none;} .rr-scrim{display:none;}
         .rr-close{position:fixed;top:24px;right:28px;z-index:3;background:none;border:none;color:#9a9aa0;font-size:20px;cursor:pointer;line-height:1;transition:color .3s,transform .3s;}
