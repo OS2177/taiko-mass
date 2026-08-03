@@ -2,8 +2,8 @@
 // Fields: title, note, status ("Live"|"Building", builds only),
 // date "YYYY-MM" (when made live/published — drives newest-first order),
 // url ("#" → "Coming soon"), thumb ("/x.png" in public, "" = none), blurb.
-// Essays: body → opens in the in-site reading room; page ("/x.html" in public)
-// → Read goes to that standalone page instead (page wins over body).
+// Essays: page ("/x.html" in public) → the row's Read link opens that
+// standalone page. Every essay needs one; there is no in-site reader.
 export const BUILDS = [
   { title:"KISSA",     note:"Zero-commission POS for independent shops", status:"Live", date:"2026-07", url:"https://kissa-site.vercel.app/", thumb:"/kissa-thumb.png", blurb:"A browser-based, zero-commission point-of-sale system for independent shops — launching across Europe and Japan in 2026/27." },
   { title:"Orbit",     note:"Discovery platform for makers",     status:"Live",     date:"2026-06", url:"https://orbit-nine-liard.vercel.app/", thumb:"/orbit-thumb.png", blurb:"A gamified discovery platform where makers ship, remix, and climb." },

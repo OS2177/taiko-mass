@@ -10,12 +10,10 @@ import { sortedBuilds, sortedEssays, FOOTER_LINKS } from "./content";
 // hero field canvases render at reduced opacity so they blend on white.
 const THEMES = {
   dark:  { void:"#06070b", ink:"#0b0d14", ash:"#7d8596", pale:"#c9cdd6", ember:"#d98a6a", mint:"#00e5a0",
-           rule:"rgba(125,133,150,0.14)", ruleHover:"rgba(217,138,106,0.5)", fieldOpacity:1, rrBg:"#faf8f5", rrInk:"#26262b", rrTitle:"#1a1a1a" },
+           rule:"rgba(125,133,150,0.14)", ruleHover:"rgba(217,138,106,0.5)", fieldOpacity:1 },
   light: { void:"#f7f7f6", ink:"#eeeeec", ash:"#6b6b6b", pale:"#1a1a1a", ember:"#c56a44", mint:"#0a9c6e",
-           rule:"rgba(30,30,30,0.12)", ruleHover:"rgba(197,106,68,0.5)", fieldOpacity:0.82, rrBg:"#faf8f5", rrInk:"#26262b", rrTitle:"#1a1a1a" },
+           rule:"rgba(30,30,30,0.12)", ruleHover:"rgba(197,106,68,0.5)", fieldOpacity:0.82 },
 };
-// Default (dark) — non-theme-aware references still resolve to this.
-const C = THEMES.dark;
 
 function useMembrane(canvasRef) {
   const s = useRef({ tx: 0.5, ty: 0.45, x: 0.5, y: 0.45, t: 0, reduced: false });
@@ -32,60 +30,6 @@ function useMembrane(canvasRef) {
     return () => removeEventListener("pointermove", m);
   }, [canvasRef]);
   return s;
-}
-
-// ---------- A · FADE + METEORITE BURN-UP (movement only) ----------
-function FieldFade() {
-  const ref = useRef(null); const s = useMembrane(ref);
-  const last = useRef({ x:0, y:0, has:false });
-  useEffect(() => {
-    const cv = ref.current, ctx = cv.getContext("2d"); let W,H,DPR,raf;
-    const rs = () => { DPR=Math.min(devicePixelRatio||1,2); W=cv.clientWidth; H=cv.clientHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); };
-    rs(); addEventListener("resize", rs);
-    const blooms = [];
-    const onMove = (e) => {
-      const r=cv.getBoundingClientRect();
-      const x=e.clientX-r.left, y=e.clientY-r.top; const L=last.current;
-      if(x<0||y<0||x>r.width||y>r.height){ L.has=false; return; }
-      if(L.has){
-        const dx=x-L.x, dy=y-L.y; const sp=Math.hypot(dx,dy);
-        if(sp>1.5){
-          const reach = Math.min(Math.max(r.width,r.height)*1.1, 100 + sp*22);
-          blooms.push({ x, y, r:8, max:reach, life:1, hot:Math.min(1, sp/45) });
-        }
-      }
-      L.x=x; L.y=y; L.has=true;
-    };
-    addEventListener("pointermove", onMove);
-    const draw = () => {
-      const st=s.current; st.t+=0.016;
-      const g = ctx.createLinearGradient(0,0,0,H);
-      g.addColorStop(0.00,"#9fb0c9");
-      g.addColorStop(0.35,"#aeb6c0");
-      g.addColorStop(0.60,"#c8c0b8");
-      g.addColorStop(0.80,"#d8b9a3");
-      g.addColorStop(0.92,"#c79f9c");
-      g.addColorStop(1.00,"#9a8e93");
-      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
-      ctx.globalCompositeOperation="lighter";
-      for(let i=blooms.length-1;i>=0;i--){ const p=blooms[i];
-        p.r += (p.max - p.r) * 0.08;
-        p.life -= 0.022;
-        if(p.life<=0){ blooms.splice(i,1); continue; }
-        const rg=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.r);
-        const a=p.life*0.13;
-        rg.addColorStop(0,`rgba(255,${190-p.hot*40},${215-p.hot*30},${a})`);
-        rg.addColorStop(0.45,`rgba(236,120,150,${a*0.5})`);
-        rg.addColorStop(1,"rgba(220,90,140,0)");
-        ctx.fillStyle=rg; ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,6.28); ctx.fill();
-      }
-      ctx.globalCompositeOperation="source-over";
-      raf=requestAnimationFrame(draw);
-    };
-    draw();
-    return () => { cancelAnimationFrame(raf); removeEventListener("resize", rs); removeEventListener("pointermove", onMove); };
-  }, []);
-  return <canvas ref={ref} style={{ width:"100%", height:"100%", display:"block" }} />;
 }
 
 // Colour sets for the square field — the single source of truth for its colours.
@@ -291,151 +235,10 @@ function FieldSquare({ palette = "dawn", fieldOpacity = 1, line = false }) {
   return <canvas ref={ref} style={{ width:"100%", height:"100%", display:"block", opacity:fieldOpacity, transition:"opacity .5s" }} />;
 }
 
-// ---------- C · MASS — layered filament sphere (smoke/fascia strata) ----------
-function FieldMass() {
-  const ref = useRef(null); const s = useMembrane(ref);
-  useEffect(() => {
-    const cv = ref.current, ctx = cv.getContext("2d"); let W,H,DPR,raf;
-    const rs = () => { DPR=Math.min(devicePixelRatio||1,2); W=cv.clientWidth; H=cv.clientHeight; cv.width=W*DPR; cv.height=H*DPR; ctx.setTransform(DPR,0,0,DPR,0,0); };
-    rs(); addEventListener("resize", rs);
-    const STRANDS = 220, SEG = 20;
-    const strands = [];
-    for(let i=0;i<STRANDS;i++){
-      const yb = (Math.random()*2-1);
-      const y0 = Math.sign(yb)*Math.pow(Math.abs(yb),1.5) * 0.92;
-      let x0 = (Math.random()*2-1)*0.95;
-      const pts=[];
-      let px=x0, py=y0;
-      const dir = (Math.random()<0.5?-1:1);
-      const wave = 0.015+Math.random()*0.03;
-      for(let j=0;j<SEG;j++){
-        pts.push([px,py]);
-        px += dir*(0.04+Math.random()*0.04);
-        py += Math.sin(j*0.6+i)*wave + (Math.random()*2-1)*0.012;
-      }
-      strands.push({ pts, seed:Math.random()*6.28, spd:0.2+Math.random()*0.5,
-        amp:0.012+Math.random()*0.03, bright:0.3+Math.random()*0.7 });
-    }
-    const draw = () => {
-      const st=s.current; st.t+=0.016;
-      st.x += (st.tx-st.x)*(st.reduced?0:0.015);
-      st.y += (st.ty-st.y)*(st.reduced?0:0.015);
-      ctx.clearRect(0,0,W,H);
-      const cx=W*0.5, cy=H*0.46, R=Math.min(W,H)*0.36;
-      const mx=st.x*W, my=st.y*H, MR=Math.min(W,H)*0.5;
-      const rot = st.reduced?0:st.t*0.02;
-      const skew = Math.sin(rot)*0.05; // very subtle volumetric sway
-      ctx.lineCap="round"; ctx.lineJoin="round";
-      ctx.globalCompositeOperation="lighter";
-      for(const str of strands){
-        const sp=[]; let avgFade=0, n=0;
-        for(let j=0;j<str.pts.length;j++){
-          let [nx,ny]=str.pts[j];
-          if(!st.reduced){
-            nx += Math.sin(st.t*0.3*str.spd + str.seed + j*0.4)*str.amp;
-            ny += Math.cos(st.t*0.25*str.spd + str.seed + j*0.3)*str.amp*0.6;
-          }
-          const r=Math.sqrt(nx*nx+ny*ny);
-          const fade = r>1 ? 0 : Math.min(1, (1-r)*3.0);
-          let X = cx + nx*R + ny*skew*R;
-          let Y = cy + ny*R;
-          const dx=X-mx, dy=Y-my, d=Math.hypot(dx,dy);
-          if(d<MR){ const f=(1-d/MR); const push=f*f*55; const a=Math.atan2(dy,dx);
-            X+=Math.cos(a)*push; Y+=Math.sin(a)*push; }
-          sp.push([X,Y,fade]); avgFade+=fade; n++;
-        }
-        avgFade = n?avgFade/n:0;
-        if(avgFade<0.02) continue;
-        for(let j=1;j<sp.length;j++){
-          const f = Math.min(sp[j-1][2], sp[j][2]);
-          if(f<=0) continue;
-          ctx.beginPath(); ctx.moveTo(sp[j-1][0],sp[j-1][1]); ctx.lineTo(sp[j][0],sp[j][1]);
-          ctx.strokeStyle=`rgba(210,218,230,${0.075*str.bright*f})`;
-          ctx.lineWidth=2.2; ctx.stroke();
-          ctx.strokeStyle=`rgba(246,250,255,${0.08*str.bright*f})`;
-          ctx.lineWidth=0.8; ctx.stroke();
-        }
-      }
-      ctx.globalCompositeOperation="source-over";
-      ctx.beginPath(); ctx.arc(cx,cy,R*1.04,0,6.28);
-      ctx.strokeStyle="rgba(170,182,200,0.045)"; ctx.lineWidth=1; ctx.stroke();
-      raf=requestAnimationFrame(draw);
-    };
-    draw();
-    return () => { cancelAnimationFrame(raf); removeEventListener("resize", rs); };
-  }, []);
-  return <canvas ref={ref} style={{ width:"100%", height:"100%", display:"block" }} />;
-}
-
-
 // ---------------- THE SITE ----------------
 
-// Still frames: one painted frame, no animation loop. Shown on resting panels
-// so only the hovered panel actually animates — far less motion at once.
-function StillFade(){
-  const ref=useRef(null);
-  useEffect(()=>{ const cv=ref.current,ctx=cv.getContext("2d");
-    const DPR=Math.min(devicePixelRatio||1,2); const W=cv.clientWidth,H=cv.clientHeight;
-    cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
-    const g=ctx.createLinearGradient(0,0,0,H);
-    g.addColorStop(0,"#9fb0c9");g.addColorStop(0.35,"#aeb6c0");g.addColorStop(0.6,"#c8c0b8");
-    g.addColorStop(0.8,"#d8b9a3");g.addColorStop(0.92,"#c79f9c");g.addColorStop(1,"#9a8e93");
-    ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-  },[]);
-  return <canvas ref={ref} style={{width:"100%",height:"100%",display:"block"}}/>;
-}
-function StillSquare(){
-  const ref=useRef(null);
-  useEffect(()=>{ const cv=ref.current,ctx=cv.getContext("2d");
-    const DPR=Math.min(devicePixelRatio||1,2); const W=cv.clientWidth,H=cv.clientHeight;
-    cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
-    const upper=[["#0a1c40","#13294d",0.34],["#1c4450","#2a5a55",0.14],["#356147","#4a7350",0.12],
-      ["#a87f35","#c39443",0.12],["#cf6238","#dd7544",0.16],["#b83c54","#c2425a",0.12]];
-    const seamY=H*0.5,seamH=H*0.04,upH=seamY-seamH/2; let y=0;
-    ctx.globalAlpha=0.6;
-    for(const [c1,c2,h] of upper){ const bh=h*upH; const bg=ctx.createLinearGradient(0,y,0,y+bh);
-      bg.addColorStop(0,c1);bg.addColorStop(1,c2);ctx.fillStyle=bg;ctx.fillRect(0,y,W,bh+1);y+=bh; }
-    y=seamY+seamH/2;const lowH=H-(seamY+seamH/2);
-    for(let i=upper.length-1;i>=0;i--){ const [c1,c2,h]=upper[i];const bh=h*lowH;
-      const bg=ctx.createLinearGradient(0,y,0,y+bh);bg.addColorStop(0,c2);bg.addColorStop(1,c1);
-      ctx.fillStyle=bg;ctx.fillRect(0,y,W,bh+1);ctx.fillStyle="rgba(6,5,11,0.42)";ctx.fillRect(0,y,W,bh+1);y+=bh; }
-    ctx.globalAlpha=1;
-    const rad=Math.min(W,H)*0.21,cx=W/2,cy=H*0.5;
-    const pg=ctx.createLinearGradient(0,cy-rad,0,cy+rad);
-    pg.addColorStop(0,"rgba(255,206,64,0.92)");pg.addColorStop(0.3,"rgba(252,168,52,0.9)");
-    pg.addColorStop(0.58,"rgba(248,120,56,0.88)");pg.addColorStop(0.8,"rgba(242,84,66,0.86)");
-    pg.addColorStop(1,"rgba(234,52,58,0.84)");
-    ctx.beginPath();ctx.arc(cx,cy,rad,0,6.28);ctx.fillStyle=pg;ctx.fill();
-  },[]);
-  return <canvas ref={ref} style={{width:"100%",height:"100%",display:"block"}}/>;
-}
-function StillMass(){
-  const ref=useRef(null);
-  useEffect(()=>{ const cv=ref.current,ctx=cv.getContext("2d");
-    const DPR=Math.min(devicePixelRatio||1,2); const W=cv.clientWidth,H=cv.clientHeight;
-    cv.width=W*DPR;cv.height=H*DPR;ctx.setTransform(DPR,0,0,DPR,0,0);
-    ctx.fillStyle="#06070b";ctx.fillRect(0,0,W,H);
-    const cx=W*0.5,cy=H*0.5,R=Math.min(W,H)*0.36;
-    ctx.globalCompositeOperation="lighter";ctx.lineCap="round";
-    for(let i=0;i<200;i++){
-      const yb=(Math.random()*2-1);const y0=Math.sign(yb)*Math.pow(Math.abs(yb),1.5)*0.92;
-      let nx=(Math.random()*2-1)*0.95,ny=y0;const dir=Math.random()<0.5?-1:1;
-      ctx.beginPath();let started=false;
-      for(let j=0;j<20;j++){ const r=Math.sqrt(nx*nx+ny*ny);
-        if(r<=1){ const f=Math.min(1,(1-r)*3); const X=cx+nx*R,Y=cy+ny*R;
-          if(!started){ctx.moveTo(X,Y);started=true;}else ctx.lineTo(X,Y);
-          ctx.strokeStyle=`rgba(220,228,240,${0.06*f})`; }
-        nx+=dir*(0.04+Math.random()*0.04);ny+=Math.sin(j*0.6+i)*0.025;
-      }
-      ctx.lineWidth=2;ctx.stroke();
-    }
-    ctx.globalCompositeOperation="source-over";
-  },[]);
-  return <canvas ref={ref} style={{width:"100%",height:"100%",display:"block"}}/>;
-}
-
 // ---------- Builds / Writing — click-to-expand accordion ----------
-function WorkRow({ item, size, open, onOpen, onClose, onRead, T=THEMES.dark }){
+function WorkRow({ item, size, open, onOpen, onClose, T=THEMES.dark }){
   const hasUrl = item.url && item.url !== "#";
   const toggle = ()=> onOpen(open ? null : item._key);
   return (
@@ -452,7 +255,7 @@ function WorkRow({ item, size, open, onOpen, onClose, onRead, T=THEMES.dark }){
       </div>
       <div className={open ? "preview" : "preview closing"} style={{ maxHeight: open ? 260 : 0 }}>
         <div className="preview-inner">
-          {!item.body && !item.page && (
+          {!item.page && (
             <div className="preview-thumb">
               <span className="lbl" style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", color:T.ash, textAlign:"center", padding:"0 12px" }}>{item.title}</span>
               {item.thumb && (
@@ -468,14 +271,10 @@ function WorkRow({ item, size, open, onOpen, onClose, onRead, T=THEMES.dark }){
               {item.page && (
                 <a className="visit" href={item.page}>Read ↗</a>
               )}
-              {!item.page && item.body && (
-                <button className="visit" onClick={()=>onRead(item)}
-                  style={{ background:"none", border:"none", cursor:"pointer", padding:"6px 0" }}>Read ↗</button>
-              )}
-              {!item.page && !item.body && hasUrl && (
+              {!item.page && hasUrl && (
                 <a className="visit" href={item.url} target="_blank" rel="noopener">Visit ↗</a>
               )}
-              {!item.page && !item.body && !hasUrl && (
+              {!item.page && !hasUrl && (
                 <span className="visit" style={{ opacity:0.5 }}>Coming soon</span>
               )}
             </div>
@@ -486,7 +285,7 @@ function WorkRow({ item, size, open, onOpen, onClose, onRead, T=THEMES.dark }){
   );
 }
 
-function WorkList({ items, size, onRead, T=THEMES.dark }){
+function WorkList({ items, size, T=THEMES.dark }){
   const [openKey, setOpenKey] = useState(null);
   const timer = useRef(null);
   const setOpen = (key)=>{ clearTimeout(timer.current); setOpenKey(key); };
@@ -497,59 +296,8 @@ function WorkList({ items, size, onRead, T=THEMES.dark }){
       {items.map((item,i)=>{
         const key = item.title + i;
         item._key = key;
-        return <WorkRow key={key} item={item} size={size} open={openKey===key} onOpen={setOpen} onClose={closeSoon} onRead={onRead} T={T} />;
+        return <WorkRow key={key} item={item} size={size} open={openKey===key} onOpen={setOpen} onClose={closeSoon} T={T} />;
       })}
-    </div>
-  );
-}
-
-// ---------- Essay reading room — tiny markdown renderer ----------
-function renderInline(text){
-  // split on **bold** / *italic*, keeping the delimiters
-  const parts = text.split(/(\*\*[^*]+\*\*|\*[^*]+\*)/g);
-  return parts.map((p,i)=>{
-    if(p.startsWith("**") && p.endsWith("**")) return <strong key={i}>{p.slice(2,-2)}</strong>;
-    if(p.startsWith("*") && p.endsWith("*")) return <em key={i}>{p.slice(1,-1)}</em>;
-    return <span key={i}>{p}</span>;
-  });
-}
-
-function Markdown({ text }){
-  const blocks = text.split(/\n\s*\n/);
-  return blocks.map((block,i)=>{
-    const b = block.trim();
-    if(!b) return null;
-    if(b.startsWith("## ")) return <h2 key={i} className="rr-h2">{renderInline(b.slice(3))}</h2>;
-    if(b.startsWith("> ")) return <blockquote key={i} className="rr-quote">{renderInline(b.slice(2))}</blockquote>;
-    return <p key={i} className="rr-p">{renderInline(b)}</p>;
-  });
-}
-
-function ReadingRoom({ essay, onClose, T=THEMES.dark }){
-  useEffect(()=>{
-    if(!essay) return;
-    const onKey = (e)=>{ if(e.key==="Escape") onClose(); };
-    addEventListener("keydown", onKey);
-    document.body.style.overflow = "hidden";
-    return ()=>{ removeEventListener("keydown", onKey); document.body.style.overflow = ""; };
-  }, [essay, onClose]);
-  if(!essay) return null;
-  return (
-    <div className="rr-scroll" onClick={onClose}>
-      <div className="rr-bg" />
-      <div className="rr-scrim" />
-      <button className="rr-close" onClick={(e)=>{ e.stopPropagation(); onClose(); }}>✕</button>
-      <div className="rr-fade" onClick={(e)=>e.stopPropagation()}>
-        <article className="rr-col">
-          <div className="lbl" style={{ color:C.ember }}>{essay.date}</div>
-          <h1 className="rr-title">{essay.title}</h1>
-          <div className="lbl" style={{ color:"#8a8a90" }}>{essay.note}</div>
-          <Markdown text={essay.body} />
-          {essay.url!=="#" && (
-            <a className="visit" href={essay.url} target="_blank" rel="noopener" style={{ color:C.ember }}>Read on the web ↗</a>
-          )}
-        </article>
-      </div>
     </div>
   );
 }
@@ -681,7 +429,6 @@ function GlitchWordmark({ variant = "rgb", style, className }) {
 }
 
 export default function TaikoMassSite() {
-  const [reading, setReading] = useState(null);
   // Persist the theme choice across visits. A stored choice always wins; on a
   // first visit with nothing stored, default to dark at night (local time 20:00
   // through 06:59), otherwise light.
@@ -730,18 +477,6 @@ export default function TaikoMassSite() {
           .row .arr{order:3;}
           .row .note{order:4;flex:0 0 100%;margin-top:6px;}
         }
-        .rr-scroll{position:fixed;inset:0;z-index:10000;overflow-y:auto;-webkit-overflow-scrolling:touch;background:${T.rrBg};}
-        .rr-bg{display:none;} .rr-scrim{display:none;}
-        .rr-close{position:fixed;top:24px;right:28px;z-index:3;background:none;border:none;color:#9a9aa0;font-size:20px;cursor:pointer;line-height:1;transition:color .3s,transform .3s;}
-        .rr-close:hover{color:${T.ember};transform:rotate(90deg);}
-        .rr-fade{position:relative;z-index:2;animation:rrFade .5s cubic-bezier(0.22,0.61,0.36,1);}
-        @keyframes rrFade{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
-        .rr-col{position:relative;max-width:660px;margin:0 auto;padding:14vh 28px 20vh;}
-        .rr-title{font-family:'Space Mono',monospace;color:${T.rrTitle};font-size:29px;line-height:1.25;letter-spacing:0.01em;margin:0 0 14px;font-weight:700;}
-        .rr-h2{font-family:'Space Mono',monospace;color:${T.ember};font-size:12px;letter-spacing:0.3em;text-transform:uppercase;margin:54px 0 18px;font-weight:700;}
-        .rr-p{font-family:'Space Mono',monospace;color:${T.rrInk};font-size:15px;line-height:1.9;margin:0 0 22px;}
-        .rr-quote{font-family:'Space Mono',monospace;color:${T.rrTitle};font-size:16px;line-height:1.7;border-left:2px solid ${T.ember};padding-left:22px;margin:30px 0;}
-        @media(max-width:680px){.rr-col{padding:12vh 22px 16vh;}.rr-title{font-size:22px;}.rr-p{font-size:14px;}}
         .panel{position:relative;flex:1;overflow:hidden;}
         :focus-visible{outline:1px solid ${T.ember};outline-offset:4px;}
         /* hero: a centered square field, edge-to-edge canvas */
@@ -781,13 +516,11 @@ export default function TaikoMassSite() {
       {/* WORKS */}
       <main style={{ maxWidth:880, margin:"0 auto", padding:"12vh 40px 14vh", position:"relative", background:T.void, transition:"background .5s" }}>
         <div className="lbl" style={{ marginBottom:32 }}>Builds</div>
-        <WorkList items={sortedBuilds} size={19} onRead={setReading} T={T}/>
+        <WorkList items={sortedBuilds} size={19} T={T}/>
 
         <div className="lbl" style={{ margin:"10vh 0 32px" }}>Writing</div>
-        <WorkList items={sortedEssays} size={15} onRead={setReading} T={T}/>
+        <WorkList items={sortedEssays} size={15} T={T}/>
       </main>
-
-      <ReadingRoom essay={reading} onClose={()=>setReading(null)} T={T} />
 
       {/* ENERGY — a second square field, mirrored, hot "sun" palette. */}
       <section className="hero">
