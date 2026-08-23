@@ -5,6 +5,7 @@
 // Essays: page ("/x.html" in public) → the row's Read link opens that
 // standalone page. Every essay needs one; there is no in-site reader.
 export const BUILDS = [
+  { title:"Neko No Michi", note:"Shiatsu practice in Brugge", status:"Live", date:"2026-08", url:"https://nekonomichi.iaos21.com", thumb:"/neko-thumb.png", blurb:"A bilingual site and booking system for a shiatsu practice in Brugge — sessions given by donation." },
   { title:"KISSA",     note:"Zero-commission POS for independent shops", status:"Live", date:"2026-07", url:"https://kissa-site.vercel.app/", thumb:"/kissa-thumb.png", blurb:"A browser-based, zero-commission point-of-sale system for independent shops — launching across Europe and Japan in 2026/27." },
   { title:"Orbit",     note:"Discovery platform for makers",     status:"Live",     date:"2026-06", url:"https://orbit-nine-liard.vercel.app/", thumb:"/orbit-thumb.png", blurb:"A gamified discovery platform where makers ship, remix, and climb." },
   { title:"Navigator", note:"Cognitive workspace",                status:"Building", date:"2026-05", url:"#", thumb:"", blurb:"A calm thinking environment — journal, write, research, create." },

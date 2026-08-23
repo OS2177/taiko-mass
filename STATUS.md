@@ -1,6 +1,6 @@
 # Taiko Mass — Build Status
 
-_Last updated: 3 August 2026_
+_Last updated: 23 August 2026_
 
 ## Live
 - **URL:** https://taiko-mass.vercel.app
@@ -119,7 +119,8 @@ Each essay is a self-contained page, not React. The scaffold, in order:
 - Under **680px**, preview cards stack vertically and the thumbnail goes full-width.
 
 ### Current site data (`src/content.js`)
-- **Builds:** KISSA (Live, 2026-07, `kissa-site.vercel.app`, thumb) · Orbit (Live, 2026-06,
+- **Builds:** Neko No Michi (Live, 2026-08, `nekonomichi.iaos21.com`, thumb) · KISSA
+  (Live, 2026-07, `kissa-site.vercel.app`, thumb) · Orbit (Live, 2026-06,
   thumb) · Navigator (Building, 2026-05) · SOMA (Building, 2026-04) · Wordmark (Building,
   2026-03, thumb). The three Building items have placeholder `#` URLs.
 - **Writing:** Humanetics (2026-07) · The Ecology of Awareness (2026-02) · On the Edge
@@ -130,7 +131,8 @@ Each essay is a self-contained page, not React. The scaffold, in order:
   match the true timeline — update each to its real make-live date over time.
 
 ### Assets
-`public/orbit-thumb.png`, `public/kissa-thumb.png`, `public/wordmark-thumb.png`. Full-page
+`public/orbit-thumb.png`, `public/kissa-thumb.png`, `public/wordmark-thumb.png`,
+`public/neko-thumb.png`. Full-page
 screenshots are wide; the thumb box renders `object-fit:contain` (whole image, letterboxed).
 Add `public/<name>-thumb.png` per build and set its `thumb` path to enable a thumbnail.
 
