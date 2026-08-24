@@ -5,7 +5,7 @@
 // Essays: page ("/x.html" in public) → the row's Read link opens that
 // standalone page. Every essay needs one; there is no in-site reader.
 export const BUILDS = [
-  { title:"Remix", note:"Intelligence workspace for one operator", status:"Live", date:"2026-08", url:"https://remix.iaos21.com", thumb:"/remix-thumb.png", blurb:"Keeps one person current with what technology can now do, and turns that into things they actually build — signal, reach, gap, spec, build." },
+  { title:"Remix", note:"Bridging the spaces between here, now and the future", status:"Live", date:"2026-08", url:"https://remix.iaos21.com", thumb:"/remix-thumb.png", blurb:"Keeps one person current with what technology can now do, and turns that into things they actually build — signal, reach, gap, spec, build." },
   { title:"Neko No Michi", note:"Shiatsu practice in Brugge", status:"Live", date:"2026-08", url:"https://nekonomichi.iaos21.com", thumb:"/neko-thumb.png", blurb:"A bilingual site and booking system for a shiatsu practice in Brugge — sessions given by donation." },
   { title:"KISSA",     note:"Zero-commission POS for independent shops", status:"Live", date:"2026-07", url:"https://kissa-site.vercel.app/", thumb:"/kissa-thumb.png", blurb:"A browser-based, zero-commission point-of-sale system for independent shops — launching across Europe and Japan in 2026/27." },
   { title:"Orbit",     note:"Discovery platform for makers",     status:"Live",     date:"2026-06", url:"https://orbit-nine-liard.vercel.app/", thumb:"/orbit-thumb.png", blurb:"A gamified discovery platform where makers ship, remix, and climb." },

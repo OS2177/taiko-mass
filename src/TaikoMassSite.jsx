@@ -264,8 +264,16 @@ function WorkRow({ item, size, open, onOpen, onClose, T=THEMES.dark }){
     ro.observe(el);
     return ()=> ro.disconnect();
   }, [open]);
+  /*
+    NO onMouseLeave HERE. It used to close on leaving THIS ROW, which meant
+    the open build collapsed the instant the cursor set off towards the next
+    heading — the list shot upwards and the heading was no longer under the
+    pointer. You had to go and find it again, every time. Leaving is now the
+    LIST's business, because leaving one row for its neighbour is not leaving
+    at all.
+  */
   return (
-    <div className="workrow" onMouseLeave={open ? onClose : undefined}>
+    <div className="workrow">
       <div className="row" role="button" tabIndex={0}
         onClick={toggle}
         onKeyDown={(e)=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); toggle(); } }}>
@@ -344,9 +352,21 @@ function WorkList({ items, size, T=THEMES.dark }){
   const timer = useRef(null);
   const setOpen = (key)=>{ clearTimeout(timer.current); setOpenKey(key); };
   const closeSoon = ()=>{ clearTimeout(timer.current); timer.current = setTimeout(()=>setOpenKey(null), 220); };
+  const stay = ()=> clearTimeout(timer.current);
   useEffect(()=>()=>clearTimeout(timer.current), []);
+  /*
+    AN OPEN BUILD CLOSES ON EXACTLY TWO THINGS: another one being opened,
+    which `openKey` handles by only ever holding one, and the cursor leaving
+    the WHOLE list. Moving between rows does neither, so nothing moves under
+    the pointer while you are reading down the list.
+
+    `stay` on re-entry is the other half. The close is on a 220ms timer, so
+    clipping the edge of the list and coming straight back — which is easy to
+    do, the rows are full-width — would otherwise collapse the build a fifth
+    of a second after the cursor was already back inside it.
+  */
   return (
-    <div>
+    <div onMouseLeave={closeSoon} onMouseEnter={stay}>
       {items.map((item,i)=>{
         const key = item.title + i;
         item._key = key;
