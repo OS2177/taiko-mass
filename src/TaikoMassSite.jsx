@@ -241,6 +241,29 @@ function FieldSquare({ palette = "dawn", fieldOpacity = 1, line = false }) {
 function WorkRow({ item, size, open, onOpen, onClose, T=THEMES.dark }){
   const hasUrl = item.url && item.url !== "#";
   const toggle = ()=> onOpen(open ? null : item._key);
+
+  /*
+    HOW FAR TO SHRINK THE 1440px FRAME so it fills this column exactly.
+
+    It cannot be done in CSS alone: the frame's width is a fixed pixel value
+    and the box's is whatever the column happens to be, and `scale()` takes a
+    ratio rather than a length, so there is nothing to divide by. Measuring is
+    the honest answer.
+
+    Re-measured on resize rather than once, or the frame keeps the scale it
+    was given at the width the page happened to open at — which on a phone
+    rotation is wrong by half.
+  */
+  const liveRef = useRef(null);
+  useEffect(()=>{
+    const el = liveRef.current;
+    if(!el || !open) return;
+    const fit = ()=> el.style.setProperty("--s", String(el.clientWidth / 1440));
+    fit();
+    const ro = new ResizeObserver(fit);
+    ro.observe(el);
+    return ()=> ro.disconnect();
+  }, [open]);
   return (
     <div className="workrow" onMouseLeave={open ? onClose : undefined}>
       <div className="row" role="button" tabIndex={0}
@@ -253,18 +276,8 @@ function WorkRow({ item, size, open, onOpen, onClose, T=THEMES.dark }){
         )}
         <span className="arr" style={{ fontSize:14, transform: open ? "rotate(90deg)" : "rotate(0deg)" }}>→</span>
       </div>
-      <div className={open ? "preview" : "preview closing"} style={{ maxHeight: open ? 260 : 0 }}>
+      <div className={open ? "preview" : "preview closing"} style={{ maxHeight: open ? 900 : 0 }}>
         <div className="preview-inner">
-          {!item.page && (
-            <div className="preview-thumb">
-              <span className="lbl" style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center", color:T.ash, textAlign:"center", padding:"0 12px" }}>{item.title}</span>
-              {item.thumb && (
-                <img src={item.thumb} alt={item.title}
-                  style={{ position:"relative", width:"100%", height:"100%", objectFit:"contain" }}
-                  onError={(e)=>{ e.currentTarget.style.display="none"; }} />
-              )}
-            </div>
-          )}
           <div className="preview-body">
             <p style={{ margin:0, color:T.pale, fontSize:13, lineHeight:1.65 }}>{item.blurb}</p>
             <div style={{ display:"flex", gap:20, alignItems:"center" }}>
@@ -279,6 +292,47 @@ function WorkRow({ item, size, open, onOpen, onClose, T=THEMES.dark }){
               )}
             </div>
           </div>
+
+          {/*
+            THE LIVE VIEW — the build itself, running, the full width of the
+            column. It replaced a 240x150 thumbnail that was too small to show
+            anything: at that size a whole site is a smudge, and the one build
+            with a dark design read as a grey rectangle.
+
+            IT IS THE REAL SITE IN AN IFRAME, not a screenshot, so it can
+            never go stale — which is the thing a screenshot of your own work
+            always eventually does.
+
+            MOUNTED ONLY WHILE OPEN. `open &&` is load-bearing: without it
+            every build on the page fetches its whole site on first paint,
+            which is six sites nobody has asked to see.
+
+            RENDERED WIDE AND SCALED DOWN. An 800px iframe makes a site lay
+            itself out for an 800px screen, so you would be looking at the
+            tablet breakpoint of every build. It is given a 1440px viewport
+            and scaled to fit, so what shows is the desktop design the build
+            was actually composed for. `transform-origin` is the top left or
+            it scales away from the centre and crops.
+
+            NOT INTERACTIVE, deliberately. A live page inside a page will
+            swallow scrolls and clicks meant for this one, and a visitor who
+            starts navigating a build inside a 500px window has been trapped
+            rather than served. `pointer-events:none` makes it a moving
+            poster; VISIT is the way in. The thumbnail stays behind it as a
+            fallback for anything that refuses to be framed — none of the
+            builds send X-Frame-Options today, but that is their choice to
+            change and not ours.
+          */}
+          {!item.page && hasUrl && (
+            <div className="preview-live" ref={liveRef} aria-hidden="true"
+              style={{ backgroundImage: item.thumb ? `url(${item.thumb})` : undefined }}>
+              {open && (
+                <iframe src={item.url} title={`${item.title} — live`}
+                  loading="lazy" tabIndex={-1} scrolling="no"
+                  sandbox="allow-scripts allow-same-origin" />
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -461,12 +515,17 @@ export default function TaikoMassSite() {
         .arr{opacity:0.5;transition:transform .4s cubic-bezier(0.16,1,0.3,1),opacity .4s,color .4s;color:${T.ember};}
         .preview{overflow:hidden;max-height:0;transition:max-height .8s cubic-bezier(0.22,0.61,0.36,1);}
         .preview.closing{transition:max-height .55s cubic-bezier(0.16,1,0.3,1);}
-        .preview-inner{display:flex;gap:24px;padding:4px 0 30px;}
-        .preview-thumb{position:relative;flex:0 0 240px;height:150px;border:1px solid ${T.rule};border-radius:2px;overflow:hidden;background:${isLight?"rgba(30,30,30,0.04)":"rgba(125,133,150,0.06)"};}
-        .preview-body{flex:1;display:flex;flex-direction:column;gap:14px;}
+        .preview-inner{display:flex;flex-direction:column;gap:22px;padding:4px 0 30px;}
+        .preview-body{display:flex;flex-direction:column;gap:14px;}
+        /* 16:10 rather than 16:9 — a landing page is taller than a video, and
+           the extra band is where the fold actually falls. */
+        .preview-live{position:relative;width:100%;aspect-ratio:16/10;border:1px solid ${T.rule};border-radius:2px;overflow:hidden;background-color:${isLight?"rgba(30,30,30,0.04)":"rgba(125,133,150,0.06)"};background-size:cover;background-position:top center;}
+        /* 1440 wide, then scaled to whatever the column is. The height is the
+           same ratio as the box so the scaled frame fills it exactly. */
+        .preview-live iframe{position:absolute;top:0;left:0;width:1440px;height:900px;border:0;transform:scale(var(--s,0.55));transform-origin:top left;pointer-events:none;}
         .visit{display:inline-block;color:${T.ember};padding:6px 0;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;transition:opacity .3s,letter-spacing .3s;}
         .visit:hover{opacity:0.7;letter-spacing:0.24em;}
-        @media(max-width:680px){.preview-inner{flex-direction:column;}.preview-thumb{flex:0 0 auto;width:100%;}}
+
         /* Narrow screens: title, status and arrow hold the first line; the
            description drops underneath the title instead of being squeezed
            between them (which used to overflow the viewport). */

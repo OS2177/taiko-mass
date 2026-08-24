@@ -1,6 +1,6 @@
 # Taiko Mass — Build Status
 
-_Last updated: 23 August 2026_
+_Last updated: 24 August 2026_
 
 ## Live
 - **URL:** https://taiko-mass.vercel.app
@@ -119,7 +119,8 @@ Each essay is a self-contained page, not React. The scaffold, in order:
 - Under **680px**, preview cards stack vertically and the thumbnail goes full-width.
 
 ### Current site data (`src/content.js`)
-- **Builds:** Neko No Michi (Live, 2026-08, `nekonomichi.iaos21.com`, thumb) · KISSA
+- **Builds:** Remix (Live, 2026-08, `remix.iaos21.com`, thumb) · Neko No Michi (Live,
+  2026-08, `nekonomichi.iaos21.com`, thumb) · KISSA
   (Live, 2026-07, `kissa-site.vercel.app`, thumb) · Orbit (Live, 2026-06,
   thumb) · Navigator (Building, 2026-05) · SOMA (Building, 2026-04) · Wordmark (Building,
   2026-03, thumb). The three Building items have placeholder `#` URLs.
@@ -132,7 +133,18 @@ Each essay is a self-contained page, not React. The scaffold, in order:
 
 ### Assets
 `public/orbit-thumb.png`, `public/kissa-thumb.png`, `public/wordmark-thumb.png`,
-`public/neko-thumb.png`. Full-page
+`public/neko-thumb.png`, `public/remix-thumb.png`.
+
+**Thumbnails are now the FALLBACK, not the preview.** An expanded build shows a LIVE
+VIEW — the real site in an iframe, the full width of the column, at 16:10. The thumb
+sits behind it and shows through only for a build that refuses to be framed. None send
+`X-Frame-Options` today, but that is each build's choice to change, not this site's.
+The frame is rendered at a 1440px viewport and scaled to fit, so what shows is the
+desktop design rather than the tablet breakpoint an 800px iframe would trigger; the
+scale is measured in JS because `scale()` takes a ratio and there is no length to
+divide by in CSS. It is `pointer-events:none` on purpose — a live page inside a page
+swallows scrolls and clicks meant for this one — and it mounts only while the row is
+open, or every build on the page fetches its whole site on first paint. Full-page
 screenshots are wide; the thumb box renders `object-fit:contain` (whole image, letterboxed).
 Add `public/<name>-thumb.png` per build and set its `thumb` path to enable a thumbnail.
 
