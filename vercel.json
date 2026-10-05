@@ -1,0 +1,7 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/kosmo", "destination": "https://kosmo-eight.vercel.app/kosmo" },
+    { "source": "/kosmo/:path*", "destination": "https://kosmo-eight.vercel.app/kosmo/:path*" }
+  ]
+}
