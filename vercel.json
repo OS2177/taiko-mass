@@ -3,6 +3,12 @@
   "rewrites": [
     { "source": "/kosmo", "destination": "https://kosmo-eight.vercel.app/kosmo/" },
     { "source": "/kosmo/", "destination": "https://kosmo-eight.vercel.app/kosmo/" },
-    { "source": "/kosmo/:path+", "destination": "https://kosmo-eight.vercel.app/kosmo/:path+" }
+    { "source": "/kosmo/:path+", "destination": "https://kosmo-eight.vercel.app/kosmo/:path+" },
+    { "source": "/lisa", "destination": "https://lisa-tilstra-hope.vercel.app/lisa/" },
+    { "source": "/lisa/", "destination": "https://lisa-tilstra-hope.vercel.app/lisa/" },
+    { "source": "/lisa/:path+", "destination": "https://lisa-tilstra-hope.vercel.app/lisa/:path+" },
+    { "source": "/mojima", "destination": "https://mojima-landing.vercel.app/mojima/" },
+    { "source": "/mojima/", "destination": "https://mojima-landing.vercel.app/mojima/" },
+    { "source": "/mojima/:path+", "destination": "https://mojima-landing.vercel.app/mojima/:path+" }
   ]
 }
