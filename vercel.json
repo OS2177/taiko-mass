@@ -9,6 +9,9 @@
     { "source": "/lisa/:path+", "destination": "https://lisa-tilstra-hope.vercel.app/lisa/:path+" },
     { "source": "/mojima", "destination": "https://mojima-landing.vercel.app/mojima/" },
     { "source": "/mojima/", "destination": "https://mojima-landing.vercel.app/mojima/" },
-    { "source": "/mojima/:path+", "destination": "https://mojima-landing.vercel.app/mojima/:path+" }
+    { "source": "/mojima/:path+", "destination": "https://mojima-landing.vercel.app/mojima/:path+" },
+    { "source": "/kosmopoliet", "destination": "https://kosmopoliet.vercel.app/kosmopoliet" },
+    { "source": "/kosmopoliet/", "destination": "https://kosmopoliet.vercel.app/kosmopoliet" },
+    { "source": "/kosmopoliet/:path+", "destination": "https://kosmopoliet.vercel.app/kosmopoliet/:path+" }
   ]
 }
