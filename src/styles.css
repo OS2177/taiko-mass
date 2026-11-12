@@ -172,12 +172,11 @@ p {
 .hero__portrait {
   position: absolute;
   inset: 0 0 0 auto;
-  width: min(62%, 1240px);
+  inset: 0;
+  width: 100%;
   height: 100%;
   object-fit: cover;
   object-position: 50% 50%;
-  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 12%);
-  mask-image: linear-gradient(to right, transparent 0, #000 12%);
   animation: photo-in 0.9s ease both;
 }
 
@@ -192,6 +191,16 @@ p {
   position: relative;
   z-index: 1;
   max-width: 560px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 24px rgba(0, 0, 0, 0.35);
+}
+
+.hero__count,
+.hero__arrows {
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 18px rgba(0, 0, 0, 0.35);
+}
+
+.hero .play {
+  box-shadow: 0 2px 18px rgba(0, 0, 0, 0.25);
 }
 
 .hero .logo {
@@ -1831,20 +1840,7 @@ textarea.field {
     padding-top: 100px;
   }
   .hero {
-    padding-top: 0;
-    min-height: 0;
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .hero__portrait {
-    position: relative;
-    inset: auto;
-    width: calc(100% + 2 * var(--pad));
-    margin: 0 calc(-1 * var(--pad)) 28px;
-    height: auto;
-    aspect-ratio: 16 / 10;
-    -webkit-mask-image: none;
-    mask-image: none;
+    padding-top: 100px;
   }
   .hero .logo {
     width: 220px;
