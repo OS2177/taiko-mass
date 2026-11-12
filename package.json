@@ -1,22 +1,25 @@
 {
-  "name": "taiko-mass-site",
+  "name": "iaos21-site",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "iAOS21 — an independent building studio. The studio site at iaos21.com, with the original Taiko Mass site kept at /taiko-mass/.",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "dev": "vite --port 5190",
+    "build": "tsc -b && vite build && vite build --config taiko/vite.config.js",
+    "preview": "vite preview --port 5190",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.4",
-    "vite": "^6.0.7"
-  },
-  "allowScripts": {
-    "esbuild@0.25.12": true
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.4",
+    "typescript": "^5.9.3",
+    "vite": "^8.2.0"
   }
 }

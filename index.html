@@ -1,12 +1,29 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-design="cinematic">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Taiko Mass</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>iAOS21 — an independent building studio</title>
+    <meta name="description" content="iAOS21 is an independent building studio. Intelligent tools, environments and experiences, shaped around the people who will use them." />
+    <meta name="theme-color" content="#0e0f0f" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <meta property="og:title" content="iAOS21 — an independent building studio" />
+    <meta property="og:description" content="A more beautiful future. Made real." />
+    <meta property="og:image" content="https://iaos21.com/img/builds/remix-desk.webp" />
+    <meta property="og:type" content="website" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=Montserrat:wght@400;500;600&display=swap" rel="stylesheet" />
+    <script>
+      // apply the saved design before first paint, so the page doesn't flash
+      try {
+        var d = new URLSearchParams(location.search).get('design') || localStorage.getItem('iaos-design')
+        if (d === 'cinematic' || d === 'editorial') document.documentElement.dataset.design = d
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
+    <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

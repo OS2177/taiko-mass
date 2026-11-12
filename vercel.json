@@ -12,6 +12,11 @@
     { "source": "/mojima/:path+", "destination": "https://mojima-landing.vercel.app/mojima/:path+" },
     { "source": "/kosmopoliet", "destination": "https://kosmopoliet.vercel.app/kosmopoliet" },
     { "source": "/kosmopoliet/", "destination": "https://kosmopoliet.vercel.app/kosmopoliet" },
-    { "source": "/kosmopoliet/:path+", "destination": "https://kosmopoliet.vercel.app/kosmopoliet/:path+" }
+    { "source": "/kosmopoliet/:path+", "destination": "https://kosmopoliet.vercel.app/kosmopoliet/:path+" },
+    { "source": "/taiko-mass", "destination": "/taiko-mass/index.html" },
+    { "source": "/((?!assets/|img/|taiko-mass/|.*\\..*).*)", "destination": "/index.html" }
+  ],
+  "headers": [
+    { "source": "/assets/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }] }
   ]
 }
