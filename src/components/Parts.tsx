@@ -33,17 +33,19 @@ export function Tile({
   eyebrow,
   title,
   lines,
+  position,
 }: {
   href: string
   image: string
   eyebrow: string
   title: string
   lines: string[]
+  position?: string
 }) {
   return (
     <Link href={href} className="tile">
       <span className="tile__media">
-        <img src={image} alt="" loading="lazy" />
+        <img src={image} alt="" loading="lazy" style={position ? { objectPosition: position } : undefined} />
       </span>
       <span className="tile__copy">
         <span className="tile__text">

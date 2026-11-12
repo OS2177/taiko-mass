@@ -331,12 +331,21 @@ p {
   transition: transform 1.2s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
+.tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: rgba(8, 8, 8, 0.16);
+}
+
 .tile::after {
   content: '';
   position: absolute;
   inset: auto 0 0;
-  height: 48%;
-  background: linear-gradient(0deg, rgba(8, 8, 8, 0.78), transparent);
+  z-index: 1;
+  height: 52%;
+  background: linear-gradient(0deg, rgba(8, 8, 8, 0.82), transparent);
 }
 
 .tile:hover img {
@@ -345,7 +354,7 @@ p {
 
 .tile__copy {
   position: absolute;
-  z-index: 1;
+  z-index: 2;
   left: clamp(14px, 5%, 26px);
   right: 14px;
   bottom: clamp(14px, 6%, 28px);
@@ -367,13 +376,13 @@ p {
 }
 
 .tile__title {
-  font-size: clamp(24px, 1.9vw, 34px);
+  font-size: clamp(22px, 1.6vw, 30px);
   line-height: 1;
 }
 
 .tile__lines {
   display: grid;
-  font: 400 13px/1.35 var(--sans);
+  font: 400 12px/1.35 var(--sans);
   letter-spacing: 0;
   text-transform: none;
   opacity: 0.85;
