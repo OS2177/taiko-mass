@@ -30,13 +30,17 @@ export function PageHead({
 export function Tile({ href, image, title, lines }: { href: string; image: string; title: string; lines: string[] }) {
   return (
     <Link href={href} className="tile">
-      <img src={image} alt="" loading="lazy" />
+      <span className="tile__media">
+        <img src={image} alt="" loading="lazy" />
+      </span>
       <span className="tile__copy">
-        <span className="tile__title serif">{title}</span>
-        <span className="caps tile__lines">
-          {lines.map((l) => (
-            <span key={l}>{l}</span>
-          ))}
+        <span className="tile__text">
+          <span className="tile__title serif">{title}</span>
+          <span className="caps tile__lines">
+            {lines.map((l) => (
+              <span key={l}>{l}</span>
+            ))}
+          </span>
         </span>
         <ArrowRight />
       </span>

@@ -172,12 +172,10 @@ p {
 .hero__portrait {
   position: absolute;
   inset: 0 0 0 auto;
-  width: min(66%, 1100px);
+  width: min(60%, 1200px);
   height: 100%;
   object-fit: cover;
-  object-position: 50% 18%;
-  -webkit-mask-image: linear-gradient(to right, transparent 0, #000 34%);
-  mask-image: linear-gradient(to right, transparent 0, #000 34%);
+  object-position: 50% 50%;
   animation: photo-in 0.9s ease both;
 }
 
@@ -298,41 +296,35 @@ p {
 }
 
 /* ───────── Home: tiles ─────────
-   Sizing from the Cinematic board: 3 × (506 × 272) with 10px white gaps. */
+   Sizing from the Cinematic board: 3 × (506 × 272) with 10px gaps.
+   The words sit under the picture, not on it. */
 
 .tiles {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 10px;
-  padding-top: 10px;
+  padding: 10px 0 clamp(24px, 3vw, 48px);
   background: var(--bg);
 }
 
 .tile {
-  position: relative;
-  overflow: hidden;
   display: block;
-  aspect-ratio: 506 / 272;
-  color: var(--white);
+  color: var(--fg);
   text-decoration: none;
+}
+
+.tile__media {
+  display: block;
+  overflow: hidden;
+  aspect-ratio: 506 / 272;
   background: var(--ink);
 }
 
 .tile img {
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
   transition: transform 1.2s cubic-bezier(0.2, 0.7, 0.2, 1);
-}
-
-.tile::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(10, 10, 10, 0.5), rgba(10, 10, 10, 0.05) 60%),
-    linear-gradient(0deg, rgba(10, 10, 10, 0.4), transparent 55%);
 }
 
 .tile:hover img {
@@ -340,30 +332,33 @@ p {
 }
 
 .tile__copy {
-  position: absolute;
-  z-index: 1;
-  left: 7%;
-  bottom: 9%;
-  display: grid;
-  gap: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+  padding: 18px clamp(16px, 2vw, 32px) 0;
 }
 
-.tile:first-child .tile__copy {
-  left: 15%;
+.tile__text {
+  display: grid;
+  gap: 8px;
 }
 
 .tile__title {
-  font-size: clamp(30px, 2.6vw, 52px);
+  font-size: clamp(26px, 2.1vw, 40px);
   line-height: 1;
 }
 
 .tile__lines {
   display: grid;
-  font-size: clamp(10px, 0.72vw, 13px);
-  letter-spacing: 0.32em;
+  font-size: clamp(9px, 0.62vw, 11px);
+  letter-spacing: 0.3em;
+  opacity: 0.7;
 }
 
 .tile svg {
+  flex: none;
+  margin-bottom: 4px;
   transition: transform 0.3s;
 }
 
@@ -527,9 +522,6 @@ p {
   max-width: 420px;
 }
 
-.hero__portrait {
-  object-position: 50% 0;
-}
 
 .hero__count {
   text-transform: uppercase;
@@ -1763,10 +1755,6 @@ textarea.field {
   .cards {
     grid-template-columns: 1fr;
   }
-  .tile {
-    aspect-ratio: 16 / 9;
-    height: auto;
-  }
   .prose-grid,
   .split,
   .service,
@@ -1809,12 +1797,21 @@ textarea.field {
     min-height: calc(100svh - var(--bar));
     padding-top: 100px;
   }
+  .hero {
+    padding-top: 0;
+    min-height: 0;
+  }
   .hero__portrait {
-    width: 100%;
-    height: 72%;
-    object-position: 60% 10%;
-    -webkit-mask-image: linear-gradient(to top, transparent 8%, #000 62%);
-    mask-image: linear-gradient(to top, transparent 8%, #000 62%);
+    position: relative;
+    inset: auto;
+    width: calc(100% + 2 * var(--pad));
+    margin: 0 calc(-1 * var(--pad)) 28px;
+    height: auto;
+    aspect-ratio: 16 / 10;
+  }
+  .hero {
+    flex-direction: column;
+    align-items: stretch;
   }
   .hero .logo {
     width: 220px;
