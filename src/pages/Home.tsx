@@ -62,7 +62,7 @@ export function Home() {
 
       <section className="tiles" aria-label="Explore">
         <Tile href="/remix" image="/img/builds/remix-dunes.webp" eyebrow="Personal computing" title="REMIX" lines={['Your future needs space.']} />
-        <Tile href="/work" image="/img/builds/mojima-hills.webp" position="50% 100%" eyebrow="Builds · applications · systems" title="The work" lines={['What we have made.']} />
+        <Tile href="/work" image="/img/builds/mojima-hills.webp" eyebrow="Builds · applications · systems" title="The work" lines={['What we have made.']} />
         <Tile href="/studio" image="/img/builds/kosmo-macro.webp" eyebrow="Independent building studio" title="The studio" lines={['Who we are and how we build.']} />
       </section>
 
