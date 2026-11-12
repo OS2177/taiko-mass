@@ -61,9 +61,9 @@ export function Home() {
       </section>
 
       <section className="tiles" aria-label="Explore">
-        <Tile href="/work" image="/img/builds/kosmo-desk2.webp" title="The work" lines={['Applications, systems', 'and explorations']} />
-        <Tile href="/remix" image="/img/builds/remix-dunes2.webp" title="REMIX" lines={['Your own intelligent', 'environment']} />
-        <Tile href="/studio" image="/img/builds/deploy-v2.webp" title="The studio" lines={['Who we are and', 'how we build']} />
+        <Tile href="/work" image="/img/builds/mojima-v2.webp" eyebrow="Builds · applications · systems" title="The work" lines={['What we have made.']} />
+        <Tile href="/remix" image="/img/builds/remix-dunes2.webp" eyebrow="Personal computing" title="REMIX" lines={['Your future needs space.']} />
+        <Tile href="/studio" image="/img/builds/snoei-v1.webp" eyebrow="Independent building studio" title="The studio" lines={['Who we are and how we build.']} />
       </section>
 
       <Selected />
