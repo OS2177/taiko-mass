@@ -42,8 +42,8 @@ export const BUILDS: Build[] = [
     kind: 'system',
     status: 'Live · in daily use',
     year: 2026,
-    hero: img('remix-dunes.webp'),
-    views: [img('remix-desk.webp'), img('remix-desk2.webp'), img('remix-phone.webp'), img('remix-dunes2.webp')],
+    hero: img('remix-dunes2.webp'),
+    views: [img('remix-desk.webp'), img('remix-desk2.webp'), img('remix-phone.webp'), img('remix-dunes.webp')],
     url: 'https://remix.iaos21.com',
     featured: true,
     about: [
