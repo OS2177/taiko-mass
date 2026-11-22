@@ -1,4 +1,4 @@
-import { PageHead, Converse } from '../components/Parts'
+import { PageHead, converse } from '../components/Parts'
 import { site } from '../site'
 
 const essays = [
@@ -11,16 +11,16 @@ const essays = [
 export function Studio() {
   return (
     <>
-      <PageHead eyebrow="The studio" title={<>An independent studio for what comes next.</>} image="/img/builds/deploy-v2.webp">
+      <PageHead eyebrow="Studio" title="An independent studio for what comes next.">
         <p>
           iAOS21 builds intelligent tools, environments and experiences, shaped around the people who will use them. Small,
           independent, and close to the work.
         </p>
       </PageHead>
 
-      <section className="section prose-grid">
+      <section className="prose-grid">
         <div className="prose">
-          <h2 className="serif">What we build</h2>
+          <h2>What we build</h2>
           <p>
             Applications people use every day: a kitchen, a shop counter, a writing room, a place to book a session. Intelligent
             systems that keep a person current with what technology can now do. And explorations: the builds that are ahead of
@@ -32,10 +32,20 @@ export function Studio() {
           </p>
         </div>
         <div className="prose">
-          <h2 className="serif">Where it comes from</h2>
+          <h2>How we work</h2>
           <p>
-            Before the studio there was a philosophy: that intelligent systems should expand what people can do, not replace it.
-            The writing that shaped it lives on, together with the site it was first published on.
+            A build request gets a page in your words first, not a quote. We build together in the workshop, live, and the
+            thing is yours from the start. When it is done, it is handed over: your space, your words, your data.
+          </p>
+          <p>
+            The studio works from REMIX, its own intelligent environment, where every build on this site was made.
+          </p>
+        </div>
+        <div className="prose">
+          <h2>Where it comes from</h2>
+          <p>
+            Before the studio there was a philosophy: that intelligent systems should expand what people can do, not replace
+            it. The writing that shaped it lives on, together with the site it was first published on.
           </p>
           <ul className="topics">
             {essays.map(([t, line, href]) => (
@@ -44,21 +54,19 @@ export function Studio() {
                 <span className="muted"> — {line}</span>
               </li>
             ))}
+            <li>
+              <a href={site.taikoMass}>Taiko Mass, the original site</a>
+            </li>
           </ul>
-          <p>
-            <a className="textlink" href={site.taikoMass}>
-              Taiko Mass, the original site
-            </a>
-          </p>
         </div>
       </section>
 
-      <section className="band band--cta">
-        <h2 className="serif">Start a conversation.</h2>
+      <section className="cta">
+        <h2 className="display">Bring something unfinished.</h2>
         <p className="muted">
-          <a href={`mailto:${site.email}`}>{site.email}</a>
+          An idea, a problem, a piece of research, a business. Write to{' '}
+          <a href={converse()}>{site.email}</a>.
         </p>
-        <Converse className="pill pill--light" />
       </section>
     </>
   )

@@ -1,72 +1,119 @@
-import { useState } from 'react'
-import { featured } from '../builds'
-import { Logo } from '../components/Logo'
-import { Tile } from '../components/Parts'
-import { Selected } from '../components/Selected'
+import { BUILDS, KINDS, featured } from '../builds'
+import { Frame, converse } from '../components/Parts'
 import { Link } from '../lib/router'
-import { ArrowLeft, ArrowRight } from '../components/icons'
+import { ArrowRight } from '../components/icons'
 
 const pad = (n: number) => String(n).padStart(2, '0')
 
-// The hero opens on the first featured build; the arrows step through the
-// others, each with its own artwork filling the right of the screen.
 export function Home() {
-  const [i, setI] = useState(0)
-  const b = featured[i]
-  const step = (d: number) => setI((i + d + featured.length) % featured.length)
+  // The showreel: 'full' builds take a row, 'half' builds pair up.
+  const rows: (typeof featured)[] = []
+  for (const b of featured) {
+    const last = rows[rows.length - 1]
+    if (b.featured === 'half' && last && last.length === 1 && last[0].featured === 'half') last.push(b)
+    else rows.push([b])
+  }
 
   return (
     <>
       <section className="hero">
-        <img key={b.hero} className="hero__portrait" src={b.hero} alt="" />
-        <div className="hero__copy">
-          <Logo />
-          <h1 className="hero__title serif">
-            A more
-            <br />
-            beautiful
-            <br />
-            <em>future.</em>
-          </h1>
-          <ul className="caps hero__list">
-            <li>Made real</li>
-            <li>Intelligent tools, environments</li>
-            <li>and experiences, shaped around</li>
-            <li>the people who will use them</li>
-          </ul>
-          <div className="hero__episode">
-            <Link href={`/work/${b.slug}`} className="play" aria-label={`Open ${b.name}`}>
-              <ArrowRight size={26} />
+        <p className="label">iAOS21 · an independent building studio</p>
+        <h1 className="display display--xl">
+          A more beautiful future.
+          <br />
+          <span>Made real.</span>
+        </h1>
+        <div className="hero__foot">
+          <p className="hero__lede">
+            We build intelligent tools, environments and experiences, shaped around the people who will use them. Small,
+            independent, and close to the work.
+          </p>
+          <div className="hero__actions">
+            <Link href="/work" className="button button--solid">
+              See the work <ArrowRight />
             </Link>
-            <div aria-live="polite">
-              <p className="caps hero__label">{i === 0 ? 'In the frame' : 'Featured build'}</p>
-              <p className="serif hero__guest">{b.name}</p>
-              <p className="serif hero__topic">{b.line}</p>
-            </div>
+            <a href={converse()} className="button">
+              Start a conversation
+            </a>
           </div>
         </div>
-        <div className="hero__count caps">
-          {pad(i + 1)} / {pad(featured.length)}
-          <span className="hero__rule" />
-          selected work
-        </div>
-        <div className="hero__arrows">
-          <button onClick={() => step(-1)} aria-label="Previous build">
-            <ArrowLeft size={44} />
-          </button>
-          <button onClick={() => step(1)} aria-label="Next build">
-            <ArrowRight size={44} />
-          </button>
-        </div>
       </section>
 
-      <section className="tiles" aria-label="Explore">
-        <Tile href="/remix" image="/img/builds/remix-dunes.webp" eyebrow="Personal computing" title="REMIX" lines={['Your future needs space.']} />
-        <Tile href="/work" image="/img/builds/mojima-hills.webp" eyebrow="Builds · applications · systems" title="The work" lines={['What we have made.']} />
-        <Tile href="/studio" image="/img/builds/kosmo-macro.webp" eyebrow="Independent building studio" title="The studio" lines={['Who we are and how we build.']} />
+      <section className="reel" aria-label="Selected work">
+        <div className="section__head">
+          <h2 className="label">Selected work</h2>
+          <p className="label muted">
+            {pad(featured.length)} of {pad(BUILDS.length)} builds
+          </p>
+        </div>
+        {rows.map((row, i) => (
+          <div key={i} className={row.length === 2 ? 'reel__row reel__row--2' : 'reel__row'}>
+            {row.map((b) => (
+              <Frame key={b.slug} b={b} eager={i === 0} />
+            ))}
+          </div>
+        ))}
       </section>
 
-      <Selected />
+      <section className="index" aria-label="All builds">
+        <div className="section__head">
+          <h2 className="label">All builds</h2>
+          <Link href="/work" className="label link">
+            The work <ArrowRight size={14} />
+          </Link>
+        </div>
+        <ol className="index__list">
+          {BUILDS.map((b, i) => (
+            <li key={b.slug}>
+              <Link href={`/work/${b.slug}`} className="index__row">
+                <span className="label muted">{pad(i + 1)}</span>
+                <span className="index__name">{b.name}</span>
+                <span className="index__line muted">{b.line}</span>
+                <span className="label muted index__kind">{KINDS[b.kind]}</span>
+                <span className="label index__status">{b.status}</span>
+              </Link>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="studio-band">
+        <div className="studio-band__grid">
+          <div>
+            <p className="label">The studio</p>
+            <h2 className="display">Every build starts with one person and one unfinished thing.</h2>
+          </div>
+          <div className="studio-band__cols">
+            <div>
+              <h3>Shaped around people</h3>
+              <p className="muted">
+                Built with the cook at the pass, the writer at the desk, the shop at the counter. The tool fits the way the work
+                already happens.
+              </p>
+            </div>
+            <div>
+              <h3>Made with the best models of the moment</h3>
+              <p className="muted">
+                Every build uses what technology can now do, and keeps up as that changes. Nothing is locked to last year.
+              </p>
+            </div>
+            <div>
+              <h3>Handed over whole</h3>
+              <p className="muted">
+                What we make is yours: your space, your words, your data. The studio keeps no way in once it is handed over.
+              </p>
+            </div>
+          </div>
+          <div className="studio-band__links">
+            <Link href="/studio" className="button">
+              About the studio <ArrowRight />
+            </Link>
+            <a href={converse()} className="button button--solid">
+              Start a conversation
+            </a>
+          </div>
+        </div>
+      </section>
     </>
   )
 }

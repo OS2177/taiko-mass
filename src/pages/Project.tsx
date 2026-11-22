@@ -1,81 +1,64 @@
 import { BUILDS, KINDS, bySlug } from '../builds'
-import { usePath, Link } from '../lib/router'
-import { PageHead, converse } from '../components/Parts'
-import { ArrowLeft, ArrowRight } from '../components/icons'
+import { OpenLink, Screen } from '../components/Parts'
+import { Link, usePath } from '../lib/router'
+import { ArrowRight } from '../components/icons'
 
-// One build: its artwork, what it is, where it stands, and the real address
-// when there is one. Nothing promised beyond the documented state.
 export function Project() {
   const path = usePath()
   const b = bySlug(path.slice(6))!
   const i = BUILDS.indexOf(b)
-  const prev = BUILDS[(i - 1 + BUILDS.length) % BUILDS.length]
   const next = BUILDS[(i + 1) % BUILDS.length]
 
   return (
-    <div className="project">
-      <PageHead eyebrow={`${KINDS[b.kind]} · ${b.status}`} title={b.name} image={b.hero}>
-        <p className="lead">{b.line}</p>
-      </PageHead>
+    <article className="project">
+      <header className="pagehead">
+        <p className="label">
+          {KINDS[b.kind]} · {b.status}
+        </p>
+        <h1 className="display">{b.name}</h1>
+        <p className="pagehead__intro">{b.line}</p>
+      </header>
 
-      <section className="section split">
-        <div className="prose">
-          {b.about.map((p, n) => (
-            <p key={n}>{p}</p>
+      <Screen whole src={b.hero} alt={`${b.name}: main screen`} eager />
+
+      <div className="project__body">
+        <div className="project__text">
+          {b.about.map((p) => (
+            <p key={p}>{p}</p>
           ))}
-          <div className="project__links">
-            {b.url ? (
-              <a className="pill" href={b.url} target="_blank" rel="noopener noreferrer">
-                Open {b.name} ↗
-              </a>
-            ) : (
-              <span className="pill pill--outline" aria-disabled="true">
-                Not public yet
-              </span>
-            )}
-            <a className="textlink" href={converse(`About ${b.name}`)}>
-              Ask about this build
-            </a>
-          </div>
+          {b.url && <OpenLink href={b.url}>Open {b.name}</OpenLink>}
         </div>
-        <aside>
-          {b.facts && (
-            <dl className="facts facts--list">
-              {b.facts.map(([k, v]) => (
-                <div key={k}>
-                  <dt className="caps muted">{k}</dt>
-                  <dd>{v}</dd>
-                </div>
-              ))}
-            </dl>
-          )}
-        </aside>
-      </section>
+        {b.facts && (
+          <dl className="facts">
+            {b.facts.map(([k, v]) => (
+              <div key={k}>
+                <dt className="label muted">{k}</dt>
+                <dd>{v}</dd>
+              </div>
+            ))}
+          </dl>
+        )}
+      </div>
 
       {b.views.length > 0 && (
-        <section className="section">
-          <p className="caps muted">More views</p>
-          <div className="gallery gallery--wide">
-            {b.views.map((v) => (
-              <img key={v} src={v} alt="" loading="lazy" />
-            ))}
-          </div>
+        <section className="views" aria-label="More screens">
+          {b.views.map((v) => (
+            <Screen whole key={v} src={v} alt={`${b.name}: another screen`} />
+          ))}
         </section>
       )}
 
-      <nav className="section project__nav" aria-label="Other builds">
-        <Link href={`/work/${prev.slug}`} className="more">
-          <ArrowLeft size={26} />
-          <span className="caps">{prev.name}</span>
-        </Link>
-        <Link href="/work" className="caps">
-          All the work
-        </Link>
-        <Link href={`/work/${next.slug}`} className="more">
-          <span className="caps">{next.name}</span>
-          <ArrowRight size={26} />
+      <nav className="project__next" aria-label="Next build">
+        <Link href={`/work/${next.slug}`} className="index__row">
+          <span className="label muted">Next</span>
+          <span className="index__name">{next.name}</span>
+          <span className="index__line muted">{next.line}</span>
+          <span className="index__kind" />
+          <span className="index__status">
+            <ArrowRight />
+          </span>
         </Link>
       </nav>
-    </div>
+    </article>
   )
 }

@@ -4,10 +4,11 @@
 // kind      → 'app' (Applications) | 'system' (Intelligent systems) | 'exploration' (Explorations)
 // status    → short, honest: what the thing is today
 // year      → when it was started
-// hero      → the wide image used in the home hero and the project page (16:10 works best)
-// views     → more images of the same build; all of them appear in the ALL view of the archive
+// hero      → the main screenshot (wide; a 16:9 crop of it is what the frames show)
+// views     → more screens of the same build, shown on its page
 // url       → the real address, or '' when there is nothing public to open yet
-// featured  → appears in the home hero rotation (in this order)
+// featured  → shows in the showreel on the home page, in this order;
+//             'full' takes the whole width, 'half' shares a row with the next one
 
 export type Kind = 'app' | 'system' | 'exploration'
 
@@ -21,15 +22,15 @@ export type Build = {
   hero: string
   views: string[]
   url: string
-  featured?: boolean
+  featured?: 'full' | 'half'
   about: string[]
   facts?: [string, string][]
 }
 
 export const KINDS: Record<Kind, string> = {
-  app: 'Applications',
-  system: 'Intelligent systems',
-  exploration: 'Explorations',
+  app: 'Application',
+  system: 'Intelligent system',
+  exploration: 'Exploration',
 }
 
 const img = (f: string) => `/img/builds/${f}`
@@ -42,10 +43,10 @@ export const BUILDS: Build[] = [
     kind: 'system',
     status: 'Live · in daily use',
     year: 2026,
-    hero: img('remix-dunes2.webp'),
-    views: [img('remix-desk.webp'), img('remix-desk2.webp'), img('remix-phone.webp'), img('remix-dunes.webp')],
+    hero: img('remix-home.webp'),
+    views: [img('remix-desk.webp'), img('remix-desk2.webp'), img('remix-dunes2.webp'), img('remix-phone.webp')],
     url: 'https://remix.iaos21.com',
-    featured: true,
+    featured: 'full',
     about: [
       'REMIX is a place for projects and tools that grow with the people using them. You bring something unfinished: an idea, a problem, a piece of research, a business. REMIX keeps it current with what technology can now do and turns it into something you actually build.',
       'Every person gets their own space. Work is built together in the workshop, then handed over: the space is theirs, in their words, and the studio has no way in.',
@@ -58,37 +59,16 @@ export const BUILDS: Build[] = [
     ],
   },
   {
-    slug: 'mojima',
-    name: 'Mojima',
-    line: 'A quieter place to write',
-    kind: 'app',
-    status: 'Live · by request',
-    year: 2026,
-    hero: img('mojima.webp'),
-    views: [img('mojima-v1.webp'), img('mojima-v2.webp')],
-    url: 'https://iaos21.com/mojima/',
-    featured: true,
-    about: [
-      'Mojima is a writing space for deeper thinking, clearer expression and a more intentional you. A studio for the writing itself and a tour of what it can hold.',
-      'It began as a build for one writer and keeps that scale: one person, their words, nothing in the way.',
-    ],
-    facts: [
-      ['Kind', 'Writing environment'],
-      ['Where', 'Web'],
-      ['Since', '2026'],
-    ],
-  },
-  {
     slug: 'kosmo',
     name: 'KOSMO',
     line: 'A kitchen that knows its menu',
     kind: 'app',
     status: 'Live · one restaurant',
     year: 2026,
-    hero: img('kosmo-desk.webp'),
-    views: [img('kosmo-desk2.webp'), img('kosmo-phone.webp')],
+    hero: img('kosmo-pantry.webp'),
+    views: [img('kosmo-larder.webp'), img('kosmo-desk.webp'), img('kosmo-desk2.webp')],
     url: 'https://iaos21.com/kosmo/',
-    featured: true,
+    featured: 'half',
     about: [
       'KOSMO is the kitchen app of a restaurant in Belgium: its recipes, its seasons, its proteins and costings, and a chat that only knows the kitchen tables and nothing else.',
       'Built with the cook, at the pass, around the way the kitchen already works.',
@@ -106,10 +86,10 @@ export const BUILDS: Build[] = [
     kind: 'app',
     status: 'Live · 2026 pilot',
     year: 2026,
-    hero: img('kissa-desk.webp'),
-    views: [img('kissa-desk2.webp'), img('kissa-phone.webp')],
+    hero: img('kissa-home.webp'),
+    views: [img('kissa-desk.webp'), img('kissa-desk2.webp')],
     url: 'https://kissa-site.vercel.app/',
-    featured: true,
+    featured: 'half',
     about: [
       'KISSA is a browser-based, zero-commission point-of-sale system for independent shops. Nothing to install, nothing taken from each sale.',
       'Piloting with independent merchants in 2026, with Europe and Japan in view for 2026/27.',
@@ -121,56 +101,16 @@ export const BUILDS: Build[] = [
     ],
   },
   {
-    slug: 'lisa',
-    name: 'Make Life Less Difficult',
-    line: 'A site for a podcast and its host',
-    kind: 'app',
-    status: 'Test build · with the client',
-    year: 2026,
-    hero: img('lisa-desk.webp'),
-    views: [img('lisa-desk2.webp'), img('lisa-phone.webp')],
-    url: 'https://iaos21.com/lisa/',
-    featured: true,
-    about: [
-      'A new home for the Make Life Less Difficult podcast and the work around it: coaching, training, facilitation, story retreats. Nearly three hundred conversations, a portrait wall, a player that follows you through the site.',
-      'The site you are reading now borrows its shape from this one.',
-    ],
-    facts: [
-      ['Kind', 'Editorial site'],
-      ['Where', 'Web'],
-      ['Since', '2026'],
-    ],
-  },
-  {
-    slug: 'neko-no-michi',
-    name: 'Neko no Michi',
-    line: 'A shiatsu practice, by donation',
-    kind: 'app',
-    status: 'Live',
-    year: 2026,
-    hero: img('neko-desk.webp'),
-    views: [img('neko-phone.webp'), img('neko-v1.webp'), img('neko-v2.webp')],
-    url: 'https://nekonomichi.iaos21.com',
-    about: [
-      'A bilingual site and booking system for a shiatsu practice in Belgium, where sessions are given by donation.',
-    ],
-    facts: [
-      ['Kind', 'Site and bookings'],
-      ['Where', 'Web'],
-      ['Since', '2026'],
-    ],
-  },
-  {
     slug: 'deploy',
     name: 'DEPLOY',
     line: 'A cutting room for films made with models',
     kind: 'system',
     status: 'Online · in development',
     year: 2026,
-    hero: img('deploy-desk.webp'),
-    views: [img('deploy-desk2.webp'), img('deploy-v1.webp'), img('deploy-v2.webp'), img('deploy-phone.webp')],
+    hero: img('deploy-drive.webp'),
+    views: [img('deploy-salt.webp'), img('deploy-v1.webp'), img('deploy-desk.webp')],
     url: 'https://deploy.iaos21.com',
-    featured: true,
+    featured: 'full',
     about: [
       'DEPLOY is where a film is written, shot with the best video models of the moment and cut: stills, takes, a sampler, an archive room for research.',
       'The first short film came out of it in November 2026. A feature-length documentary is in research.',
@@ -182,15 +122,78 @@ export const BUILDS: Build[] = [
     ],
   },
   {
+    slug: 'mojima',
+    name: 'Mojima',
+    line: 'A quieter place to write',
+    kind: 'app',
+    status: 'Live · by request',
+    year: 2026,
+    hero: img('mojima-door.webp'),
+    views: [img('mojima.webp'), img('mojima-v1.webp')],
+    url: 'https://iaos21.com/mojima/',
+    featured: 'half',
+    about: [
+      'Mojima is a writing space for deeper thinking, clearer expression and a more intentional you. A studio for the writing itself and a tour of what it can hold.',
+      'It began as a build for one writer and keeps that scale: one person, their words, nothing in the way.',
+    ],
+    facts: [
+      ['Kind', 'Writing environment'],
+      ['Where', 'Web'],
+      ['Since', '2026'],
+    ],
+  },
+  {
+    slug: 'lisa',
+    name: 'Make Life Less Difficult',
+    line: 'A site for a podcast and its host',
+    kind: 'app',
+    status: 'Test build · with the client',
+    year: 2026,
+    hero: img('lisa-home.webp'),
+    views: [img('lisa-desk2.webp'), img('lisa-phone.webp')],
+    url: 'https://iaos21.com/lisa/',
+    featured: 'half',
+    about: [
+      'A new home for the Make Life Less Difficult podcast and the work around it: coaching, training, facilitation, story retreats. Nearly three hundred conversations, a portrait wall, a player that follows you through the site.',
+    ],
+    facts: [
+      ['Kind', 'Editorial site'],
+      ['Where', 'Web'],
+      ['Since', '2026'],
+    ],
+  },
+  {
+    slug: 'aeon',
+    name: 'AEON',
+    line: 'A native music workstation',
+    kind: 'app',
+    status: 'In build · first native version',
+    year: 2026,
+    hero: img('aeon-soundlab.webp'),
+    views: [img('aeon-decks.webp'), img('aeon-perform.webp'), img('aeon-fm.webp'), img('aeon-arrange.webp'), img('aeon-overview.webp')],
+    url: '',
+    featured: 'full',
+    about: [
+      'AEON is a native music workstation: a sound lab with an effects rack, drums, keys with an FM engine, an arranger, a performance surface, four decks and a mixer. Built in C++ with a phone companion for playing it from across the room.',
+      'A first version runs on the desktop and is being tested by hand. The screens here are from it.',
+    ],
+    facts: [
+      ['Kind', 'Music software'],
+      ['Where', 'Desktop, native'],
+      ['Since', '2026'],
+    ],
+  },
+  {
     slug: 'trendinq',
     name: 'TrendinQ × VIX',
-    line: 'A front door for paper trading',
+    line: 'Two brands, one front door',
     kind: 'app',
     status: 'Live build · with the client',
     year: 2026,
-    hero: img('vix-desk.webp'),
+    hero: img('vix-home.webp'),
     views: [img('vix-desk2.webp'), img('vix-phone.webp')],
     url: 'https://vix-eight.vercel.app',
+    featured: 'half',
     about: [
       'A site, login and receivables view for a paper-trading coach and his supplies shop. Built live, with him watching.',
     ],
@@ -207,9 +210,10 @@ export const BUILDS: Build[] = [
     kind: 'exploration',
     status: 'Live · prototype',
     year: 2026,
-    hero: img('orbit-desk.webp'),
+    hero: img('orbit-home.webp'),
     views: [img('orbit-desk2.webp'), img('orbit-phone.webp')],
     url: 'https://orbit-nine-liard.vercel.app/',
+    featured: 'half',
     about: ['A gamified discovery platform where makers ship, remix and climb.'],
     facts: [
       ['Kind', 'Platform prototype'],
@@ -218,23 +222,59 @@ export const BUILDS: Build[] = [
     ],
   },
   {
-    slug: 'aeon',
-    name: 'AEON',
-    line: 'A sampler and music workstation',
-    kind: 'app',
-    status: 'In build · native, first version',
+    slug: 'wordmark',
+    name: 'Wordmark',
+    line: 'Describe a page, get a real one',
+    kind: 'exploration',
+    status: 'Prototype',
     year: 2026,
-    hero: img('aeon.webp'),
-    views: [img('aeon-v1.webp'), img('aeon-v2.webp')],
+    hero: img('wordmark-gallery.webp'),
+    views: [img('wordmark-home.webp')],
     url: '',
-    featured: true,
+    featured: 'half',
     about: [
-      'AEON is a native music workstation: a sampler, an effects rack, a library, an export. Built in C++ with a phone companion for playing it from across the room.',
-      'A first version exists and is being tested by hand. The pictures are design boards of what it is becoming.',
+      'One screen. You describe what you want to make and Wordmark returns a real, self-contained page: type, colour, imagery, motion. Then you change anything by selecting it and saying so.',
     ],
     facts: [
-      ['Kind', 'Music software'],
-      ['Where', 'Desktop, native'],
+      ['Kind', 'Page maker'],
+      ['Where', 'Browser'],
+      ['Since', '2026'],
+    ],
+  },
+  {
+    slug: 'lingua',
+    name: 'Lingua',
+    line: 'Chat, learn, connect',
+    kind: 'app',
+    status: 'Prototype',
+    year: 2026,
+    hero: img('lingua-home.webp'),
+    views: [],
+    url: '',
+    featured: 'half',
+    about: [
+      'A conversation app for learning a language with the people who speak it: you write in yours, they read in theirs, and the words you need stay with you.',
+    ],
+    facts: [
+      ['Kind', 'Language app'],
+      ['Where', 'Web'],
+      ['Since', '2026'],
+    ],
+  },
+  {
+    slug: 'neko-no-michi',
+    name: 'Neko no Michi',
+    line: 'A shiatsu practice, by donation',
+    kind: 'app',
+    status: 'Live',
+    year: 2026,
+    hero: img('neko-v1.webp'),
+    views: [img('neko-desk.webp'), img('neko-phone.webp'), img('neko-v2.webp')],
+    url: 'https://nekonomichi.iaos21.com',
+    about: ['A bilingual site and booking system for a shiatsu practice in Belgium, where sessions are given by donation.'],
+    facts: [
+      ['Kind', 'Site and bookings'],
+      ['Where', 'Web'],
       ['Since', '2026'],
     ],
   },

@@ -14,11 +14,12 @@ export const site = {
 }
 
 export const nav = [
-  { href: '/work', label: 'The work' },
-  { href: '/approach', label: 'The approach' },
-  { href: '/studio', label: 'The studio' },
+  { href: '/work', label: 'Work' },
+  { href: '/studio', label: 'Studio' },
   { href: '/remix', label: 'REMIX' },
 ]
 
-// Old Taiko Mass paths that moved
-export const redirects: Record<string, string> = {}
+// Paths that moved
+export const redirects: Record<string, string> = {
+  '/approach': '/studio',
+}
