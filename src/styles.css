@@ -397,7 +397,7 @@ body {
 }
 .pop__window {
   /* as wide as the screen allows, and never taller than it: the bar, the screen (16:10) and the foot all fit */
-  width: min(1440px, 100%, calc((100svh - var(--bar) - 220px) * 1.6));
+  width: min(1440px, 100%, calc((100svh - var(--bar) - 270px) * 1.6));
   max-height: 100%;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
@@ -476,17 +476,22 @@ body {
   object-position: top center;
   animation: fade 0.5s ease;
 }
+/* Stills are shown whole, never zoomed; only the walk-through film fills the screen */
+.pop__screen img {
+  object-fit: contain;
+  object-position: center;
+}
 .pop__foot {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 24px;
-  padding: 16px 20px;
+  gap: 32px;
+  padding: 28px 24px 26px;
   border-top: 1px solid var(--line);
 }
 .pop__words {
   display: grid;
-  gap: 4px;
+  gap: 8px;
   min-width: 0;
 }
 .pop__words .muted:last-child {
