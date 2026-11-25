@@ -476,6 +476,73 @@ body {
   object-position: top center;
   animation: fade 0.5s ease;
 }
+/* The controls: a quiet strip in the corner, there when the pointer is over the screen or the film is paused */
+.pop__screen {
+  cursor: pointer;
+}
+.pop__ctl {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(10, 10, 11, 0.72);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  opacity: 0;
+  transition: opacity 0.25s;
+  cursor: default;
+}
+.pop__screen:hover .pop__ctl,
+.pop__screen.is-paused .pop__ctl,
+.pop__ctl:focus-within {
+  opacity: 1;
+}
+@media (hover: none) {
+  .pop__ctl {
+    opacity: 1;
+  }
+}
+.pop__ctl button {
+  width: 34px;
+  height: 34px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  color: rgba(255, 255, 255, 0.82);
+  font-family: var(--mono, inherit);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  transition: background 0.15s, color 0.15s;
+}
+.pop__ctl button:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.12);
+}
+.pop__ctl .pop__speed {
+  width: auto;
+  padding: 0 10px;
+}
+.pop__ctl .pop__speed.is-on {
+  color: #0e0e10;
+  background: rgba(255, 255, 255, 0.9);
+}
+/* Full screen: the screen fills the display, the picture or film sits whole in the middle */
+.pop__screen:fullscreen {
+  aspect-ratio: auto;
+  background: #000;
+}
+.pop__screen:fullscreen video,
+.pop__screen:fullscreen img {
+  object-fit: contain;
+  object-position: center;
+}
 /* Stills are shown whole, never zoomed; only the walk-through film fills the screen */
 .pop__screen img {
   object-fit: contain;

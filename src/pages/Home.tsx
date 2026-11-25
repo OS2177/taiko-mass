@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { BUILDS, CAROUSEL, KINDS, bySlug, type Build } from '../builds'
 import { Film, OpenLink, converse } from '../components/Parts'
 import { about, closing, hero, site } from '../site'
-import { ArrowRight, Close } from '../components/icons'
+import { ArrowRight, Close, Expand, Pause, Play, Shrink, SkipBack, SkipForward } from '../components/icons'
 
 const pad = (n: number) => String(n).padStart(2, '0')
 
@@ -162,15 +162,59 @@ function Card({ b, eager, open, onOpen }: { b: Build; eager: boolean; open: bool
 }
 
 // The opened card: a window over the page, the way the build looks when it is open on your screen.
-// The walk-through starts by itself and keeps going, no controls; until it is recorded, the stills take turns.
+// The walk-through starts by itself and keeps going; until it is recorded, the stills take turns.
+// Quiet controls over the screen: back, pause, forward, slower, full screen (also Space, arrows, F).
 function Journey({ b, onClose }: { b: Build; onClose: () => void }) {
   const stills = [b.hero, ...b.views]
   const [i, setI] = useState(0)
+  const [paused, setPaused] = useState(false)
+  const [slow, setSlow] = useState(false)
+  const [full, setFull] = useState(false)
+  const screen = useRef<HTMLDivElement>(null)
+  const video = useRef<HTMLVideoElement>(null)
+
+  // Stills take turns on their own, unless paused
   useEffect(() => {
-    if (b.film || stills.length < 2) return
-    const t = window.setInterval(() => setI((n) => (n + 1) % stills.length), 2800)
+    if (b.film || stills.length < 2 || paused) return
+    const t = window.setInterval(() => setI((n) => (n + 1) % stills.length), slow ? 5600 : 2800)
     return () => window.clearInterval(t)
-  }, [b.film, stills.length])
+  }, [b.film, stills.length, paused, slow])
+  useEffect(() => {
+    const v = video.current
+    if (!v) return
+    v.playbackRate = slow ? 0.6 : 1
+    if (paused) v.pause()
+    else v.play().catch(() => {})
+  }, [paused, slow])
+  useEffect(() => {
+    const on = () => setFull(!!document.fullscreenElement)
+    document.addEventListener('fullscreenchange', on)
+    return () => document.removeEventListener('fullscreenchange', on)
+  }, [])
+
+  const back = () => {
+    if (video.current) video.current.currentTime = Math.max(0, video.current.currentTime - 5)
+    else setI((n) => (n - 1 + stills.length) % stills.length)
+  }
+  const forward = () => {
+    if (video.current) video.current.currentTime = Math.min(video.current.duration || 0, video.current.currentTime + 5)
+    else setI((n) => (n + 1) % stills.length)
+  }
+  const toggleFull = () => {
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {})
+    else screen.current?.requestFullscreen().catch(() => {})
+  }
+  useEffect(() => {
+    const key = (e: KeyboardEvent) => {
+      if (e.key === ' ' || e.key === 'k') { e.preventDefault(); setPaused((p) => !p) }
+      else if (e.key === 'ArrowLeft') back()
+      else if (e.key === 'ArrowRight') forward()
+      else if (e.key === 'f') toggleFull()
+    }
+    window.addEventListener('keydown', key)
+    return () => window.removeEventListener('keydown', key)
+  })
+
   const address = b.url ? b.url.replace(/^https?:\/\//, '').replace(/\/$/, '') : `${b.name.toLowerCase()} · not public yet`
   return (
     <div className="pop" role="dialog" aria-modal="true" aria-label={`${b.name}, the walk-through`} onClick={onClose}>
@@ -184,12 +228,29 @@ function Journey({ b, onClose }: { b: Build; onClose: () => void }) {
             <Close size={18} />
           </button>
         </div>
-        <div className="pop__screen">
+        <div className={`pop__screen${paused ? ' is-paused' : ''}`} ref={screen} onClick={() => setPaused((p) => !p)}>
           {b.film ? (
-            <video src={b.film} poster={b.hero} muted autoPlay loop playsInline preload="auto" disablePictureInPicture />
+            <video ref={video} src={b.film} poster={b.hero} muted autoPlay loop playsInline preload="auto" disablePictureInPicture />
           ) : (
             <img key={stills[i]} src={stills[i]} alt="" />
           )}
+          <div className="pop__ctl" onClick={(e) => e.stopPropagation()}>
+            <button onClick={back} aria-label={b.film ? 'Back five seconds' : 'Previous screen'} title={b.film ? 'Back 5 s (←)' : 'Previous (←)'}>
+              <SkipBack />
+            </button>
+            <button onClick={() => setPaused((p) => !p)} aria-label={paused ? 'Play' : 'Pause'} title={paused ? 'Play (space)' : 'Pause (space)'}>
+              {paused ? <Play /> : <Pause />}
+            </button>
+            <button onClick={forward} aria-label={b.film ? 'Forward five seconds' : 'Next screen'} title={b.film ? 'Forward 5 s (→)' : 'Next (→)'}>
+              <SkipForward />
+            </button>
+            <button className={`pop__speed${slow ? ' is-on' : ''}`} onClick={() => setSlow((s) => !s)} aria-pressed={slow} title={slow ? 'Back to normal speed' : 'Slower'}>
+              {slow ? 'slow' : '1×'}
+            </button>
+            <button onClick={toggleFull} aria-label={full ? 'Leave full screen' : 'Full screen'} title={full ? 'Leave full screen (F)' : 'Full screen (F)'}>
+              {full ? <Shrink /> : <Expand />}
+            </button>
+          </div>
         </div>
         <div className="pop__foot">
           <div className="pop__words">
