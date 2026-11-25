@@ -181,7 +181,7 @@ body {
   justify-content: space-between;
   gap: 20px;
   padding: 0 var(--gutter);
-  background: color-mix(in srgb, var(--bg) 28%, transparent);
+  background: color-mix(in srgb, var(--bg) 38%, transparent);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-top: 1px solid var(--line);
@@ -206,7 +206,7 @@ body {
   font-weight: 500;
 }
 .bar__links a {
-  color: var(--muted);
+  color: var(--text);
   transition: color 0.15s;
   display: inline-flex;
   align-items: center;
@@ -217,6 +217,7 @@ body {
 }
 .bar__copy {
   white-space: nowrap;
+  color: var(--text);
 }
 
 /* Films (the hero and the closing one) */

@@ -33,7 +33,7 @@ export function Bar() {
           </a>
         </li>
       </ul>
-      <p className="bar__copy label muted">© {new Date().getFullYear()}</p>
+      <p className="bar__copy label">© {new Date().getFullYear()}</p>
     </nav>
   )
 }
