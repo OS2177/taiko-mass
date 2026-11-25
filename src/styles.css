@@ -177,9 +177,9 @@ body {
   justify-content: space-between;
   gap: 20px;
   padding: 0 var(--gutter);
-  background: color-mix(in srgb, var(--bg) 82%, transparent);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+  background: color-mix(in srgb, var(--bg) 42%, transparent);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   border-top: 1px solid var(--line);
 }
 .logo {
@@ -233,16 +233,47 @@ body {
 
 /* Hero: the opening film fills the screen above the bar; the words sit on it */
 .hero {
+  /* The opening: a spacer the height of the first screen. The film itself is fixed to the
+     viewport and stays behind everything that scrolls over it, bar included. */
   margin: 0 calc(-1 * var(--gutter));
-}
-.hero__film {
   height: calc(100svh - var(--bar));
   min-height: 520px;
+}
+.hero__film {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  height: 100svh;
+  background: var(--bg);
 }
 .hero__film video,
 .hero__film img {
   position: absolute;
   inset: 0;
+}
+/* The words and the cue drift up and fade as the builds come in over the hero (set from Home.tsx) */
+.hero__words,
+.hero__cue {
+  transform: translateY(calc(var(--hero-scroll, 0) * -0.45px));
+  opacity: calc(1 - var(--hero-scroll, 0) / var(--hero-fade, 520));
+  will-change: transform, opacity;
+}
+/* Everything after the hero rides over the film on a dark glass so the film stays visible behind it */
+.builds,
+.closing,
+.about {
+  position: relative;
+  z-index: 1;
+  margin-left: calc(-1 * var(--gutter));
+  margin-right: calc(-1 * var(--gutter));
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.builds {
+  border-top: 1px solid var(--line);
 }
 .hero__words {
   position: absolute;

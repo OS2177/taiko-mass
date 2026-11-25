@@ -70,6 +70,22 @@ export function Home() {
     }).catch(() => {})
   }, [])
 
+  // As the page scrolls, the hero's words lift and fade while the builds come in over the film
+  useEffect(() => {
+    const root = document.documentElement
+    let raf = 0
+    const tick = () => {
+      raf = 0
+      root.style.setProperty('--hero-scroll', String(Math.max(0, window.scrollY)))
+      root.style.setProperty('--hero-fade', String(Math.max(320, window.innerHeight * 0.6)))
+    }
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(tick) }
+    tick()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => { window.removeEventListener('scroll', onScroll); window.removeEventListener('resize', onScroll); if (raf) cancelAnimationFrame(raf) }
+  }, [])
+
   return (
     <>
       <section className="hero" id="top">
@@ -108,10 +124,12 @@ export function Home() {
 
       {current && <Journey key={current.slug} b={current} onClose={close} />}
 
-      <section className="closing" aria-label="Closing film">
-        <Film video={closing.video} poster={closing.poster} className="closing__film" />
-        {closing.caption && <p className="label muted closing__caption">{closing.caption}</p>}
-      </section>
+      {(closing.video || closing.poster) && (
+        <section className="closing" aria-label="Closing film">
+          <Film video={closing.video} poster={closing.poster} className="closing__film" />
+          {closing.caption && <p className="label muted closing__caption">{closing.caption}</p>}
+        </section>
+      )}
 
       <section className="about" id="about">
         <div className="about__grid">
