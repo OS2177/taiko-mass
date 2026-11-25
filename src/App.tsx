@@ -1,40 +1,23 @@
 import { useEffect } from 'react'
 import { usePath } from './lib/router'
 import { site } from './site'
-import { Nav } from './components/Nav'
-import { Footer } from './components/Parts'
+import { Bar } from './components/Bar'
 import { Home } from './pages/Home'
-import { Work } from './pages/Work'
-import { Project } from './pages/Project'
-import { Studio } from './pages/Studio'
-import { Remix } from './pages/Remix'
 import { NotFound } from './pages/NotFound'
-import { bySlug } from './builds'
 
+// One page. Old addresses (/work/<slug>) land on the same page with that build's card open.
 export function App() {
   const path = usePath()
-
-  let Page: () => React.JSX.Element = NotFound
-  let title = 'Not found'
-  if (path === '/') [Page, title] = [Home, site.title]
-  else if (path === '/work') [Page, title] = [Work, 'Work']
-  else if (path.startsWith('/work/')) {
-    const b = bySlug(path.slice(6))
-    if (b) [Page, title] = [Project, b.name]
-  } else if (path === '/studio') [Page, title] = [Studio, 'Studio']
-  else if (path === '/remix') [Page, title] = [Remix, 'REMIX']
+  const home = path === '/' || path.startsWith('/work/')
 
   useEffect(() => {
-    document.title = path === '/' ? site.title : `${title} · ${site.name}`
-  }, [path, title])
+    document.title = home ? site.title : `Not found · ${site.name}`
+  }, [home])
 
   return (
     <>
-      <Nav />
-      <main>
-        <Page key={path} />
-      </main>
-      <Footer />
+      <main>{home ? <Home /> : <NotFound />}</main>
+      <Bar />
     </>
   )
 }

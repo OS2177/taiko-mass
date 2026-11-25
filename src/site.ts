@@ -1,4 +1,4 @@
-// Everything about the site that isn't a build: names, links, navigation.
+// Everything about the site that isn't a build: names, links, the two films, the words about Jack.
 
 export const site = {
   name: 'iAOS21',
@@ -13,13 +13,48 @@ export const site = {
   linkedin: 'https://www.linkedin.com/in/iaos21/',
 }
 
+// The opening film, made in DEPLOY. Put the file in /public/film/ and name it here.
+// While there is no film yet the page shows the poster (or a dark surface when that is empty too).
+export const hero = {
+  video: '',
+  poster: '',
+  line: 'A more beautiful future. Made real.',
+}
+
+// The closing film, under the builds.
+export const closing = {
+  video: '',
+  poster: '',
+  caption: '',
+}
+
+// About Jack, in his words. Change the lines here; nothing else writes about him.
+export const about = {
+  eyebrow: 'About',
+  title: 'Every build here started with one person and one unfinished thing.',
+  paragraphs: [
+    'I am Jack. iAOS21 is my studio: a small, independent place where intelligent tools, environments and experiences are built around the people who will use them.',
+    'Before the studio I cooked, and ran a coffee bar. That is where the way of working comes from: build with the cook at the pass, the writer at the desk, the shop at the counter, and hand it over whole.',
+    'Everything on this page was made from REMIX, the environment I built for it, and most of it is open by request.',
+  ],
+  writing: [
+    ['Humanetics', 'Designing intelligent systems to expand human potential', '/humanetics.html'],
+    ['The Ecology of Awareness', 'Consciousness in information fields', '/the-ecology-of-awareness.html'],
+    ['On the Edge', 'Marginality as a driver of change', '/on-the-edge.html'],
+    ['The Open Loop', 'The body as process', '/the-open-loop.html'],
+  ] as [string, string, string][],
+}
+
+// The bar at the bottom of the screen: these are places on the one page.
 export const nav = [
-  { href: '/work', label: 'Work' },
-  { href: '/studio', label: 'Studio' },
-  { href: '/remix', label: 'REMIX' },
+  { href: '/#builds', label: 'Builds' },
+  { href: '/#about', label: 'About' },
 ]
 
-// Paths that moved
+// Paths that moved (the old site had pages; this one has one page with places on it)
 export const redirects: Record<string, string> = {
-  '/approach': '/studio',
+  '/approach': '/#about',
+  '/studio': '/#about',
+  '/work': '/#builds',
+  '/remix': '/#remix',
 }

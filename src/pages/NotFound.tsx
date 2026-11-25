@@ -1,12 +1,13 @@
-import { PageHead } from '../components/Parts'
 import { Link } from '../lib/router'
 
 export function NotFound() {
   return (
-    <PageHead eyebrow="404" title="Nothing here.">
-      <p>
-        <Link href="/">Back to the start</Link> or <Link href="/work">the work</Link>.
+    <section className="notfound">
+      <p className="label">404</p>
+      <h1 className="display">Nothing here.</h1>
+      <p className="muted">
+        <Link href="/">Back to the start</Link>.
       </p>
-    </PageHead>
+    </section>
   )
 }

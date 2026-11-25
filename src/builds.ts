@@ -1,14 +1,15 @@
 // THE BUILDS — edit this file to update the site. No component code here.
 //
-// slug      → /work/<slug>
+// slug      → the card's address on the home page: /#<slug>
 // kind      → 'app' (Applications) | 'system' (Intelligent systems) | 'exploration' (Explorations)
 // status    → short, honest: what the thing is today
 // year      → when it was started
-// hero      → the main screenshot (wide; a 16:9 crop of it is what the frames show)
-// views     → more screens of the same build, shown on its page
+// hero      → the main screenshot (wide; a 16:10 crop of it is what the cards show)
+// views     → more screens of the same build, shown when the card is opened
 // url       → the real address, or '' when there is nothing public to open yet
-// featured  → shows in the showreel on the home page, in this order;
-//             'full' takes the whole width, 'half' shares a row with the next one
+// film      → the run-through: a short recorded walk through the build (mp4/webm in /film/), or . when not recorded yet
+// access    → how a visitor gets in when the url is not open to all, e.g. "By request"
+// ORDER     → the carousel order on the home page (below)
 
 export type Kind = 'app' | 'system' | 'exploration'
 
@@ -22,7 +23,9 @@ export type Build = {
   hero: string
   views: string[]
   url: string
-  featured?: 'full' | 'half'
+  film?: string
+  access?: string
+| 'half'
   about: string[]
   facts?: [string, string][]
 }
@@ -46,7 +49,8 @@ export const BUILDS: Build[] = [
     hero: img('remix-home.webp'),
     views: [img('remix-desk.webp'), img('remix-desk2.webp'), img('remix-dunes2.webp'), img('remix-phone.webp')],
     url: 'https://remix.iaos21.com',
-    featured: 'full',
+    access: 'By invitation',
+
     about: [
       'REMIX is a place for projects and tools that grow with the people using them. You bring something unfinished: an idea, a problem, a piece of research, a business. REMIX keeps it current with what technology can now do and turns it into something you actually build.',
       'Every person gets their own space. Work is built together in the workshop, then handed over: the space is theirs, in their words, and the studio has no way in.',
@@ -68,7 +72,8 @@ export const BUILDS: Build[] = [
     hero: img('kosmo-pantry.webp'),
     views: [img('kosmo-larder.webp'), img('kosmo-desk.webp'), img('kosmo-desk2.webp')],
     url: 'https://iaos21.com/kosmo/',
-    featured: 'half',
+    access: 'The kitchen is by request',
+
     about: [
       'KOSMO is the kitchen app of a restaurant in Belgium: its recipes, its seasons, its proteins and costings, and a chat that only knows the kitchen tables and nothing else.',
       'Built with the cook, at the pass, around the way the kitchen already works.',
@@ -89,7 +94,8 @@ export const BUILDS: Build[] = [
     hero: img('kissa-home.webp'),
     views: [img('kissa-desk.webp'), img('kissa-desk2.webp')],
     url: 'https://kissa-site.vercel.app/',
-    featured: 'half',
+    access: 'The counter and kitchen screens are by request',
+
     about: [
       'KISSA is a browser-based, zero-commission point-of-sale system for independent shops. Nothing to install, nothing taken from each sale.',
       'Piloting with independent merchants in 2026, with Europe and Japan in view for 2026/27.',
@@ -110,7 +116,8 @@ export const BUILDS: Build[] = [
     hero: img('deploy-drive.webp'),
     views: [img('deploy-salt.webp'), img('deploy-v1.webp'), img('deploy-desk.webp')],
     url: 'https://deploy.iaos21.com',
-    featured: 'full',
+    access: 'By request',
+
     about: [
       'DEPLOY is where a film is written, shot with the best video models of the moment and cut: stills, takes, a sampler, an archive room for research.',
       'The first short film came out of it in November 2026. A feature-length documentary is in research.',
@@ -131,7 +138,7 @@ export const BUILDS: Build[] = [
     hero: img('mojima-door.webp'),
     views: [img('mojima.webp'), img('mojima-v1.webp')],
     url: 'https://iaos21.com/mojima/',
-    featured: 'half',
+
     about: [
       'Mojima is a writing space for deeper thinking, clearer expression and a more intentional you. A studio for the writing itself and a tour of what it can hold.',
       'It began as a build for one writer and keeps that scale: one person, their words, nothing in the way.',
@@ -152,7 +159,7 @@ export const BUILDS: Build[] = [
     hero: img('lisa-home.webp'),
     views: [img('lisa-desk2.webp'), img('lisa-phone.webp')],
     url: 'https://iaos21.com/lisa/',
-    featured: 'half',
+
     about: [
       'A new home for the Make Life Less Difficult podcast and the work around it: coaching, training, facilitation, story retreats. Nearly three hundred conversations, a portrait wall, a player that follows you through the site.',
     ],
@@ -172,7 +179,8 @@ export const BUILDS: Build[] = [
     hero: img('aeon-soundlab.webp'),
     views: [img('aeon-decks.webp'), img('aeon-perform.webp'), img('aeon-fm.webp'), img('aeon-arrange.webp'), img('aeon-overview.webp')],
     url: '',
-    featured: 'full',
+    access: 'Native app, not public yet',
+
     about: [
       'AEON is a native music workstation: a sound lab with an effects rack, drums, keys with an FM engine, an arranger, a performance surface, four decks and a mixer. Built in C++ with a phone companion for playing it from across the room.',
       'A first version runs on the desktop and is being tested by hand. The screens here are from it.',
@@ -193,7 +201,7 @@ export const BUILDS: Build[] = [
     hero: img('vix-home.webp'),
     views: [img('vix-desk2.webp'), img('vix-phone.webp')],
     url: 'https://vix-eight.vercel.app',
-    featured: 'half',
+
     about: [
       'A site, login and receivables view for a paper-trading coach and his supplies shop. Built live, with him watching.',
     ],
@@ -213,7 +221,7 @@ export const BUILDS: Build[] = [
     hero: img('orbit-home.webp'),
     views: [img('orbit-desk2.webp'), img('orbit-phone.webp')],
     url: 'https://orbit-nine-liard.vercel.app/',
-    featured: 'half',
+
     about: ['A gamified discovery platform where makers ship, remix and climb.'],
     facts: [
       ['Kind', 'Platform prototype'],
@@ -231,7 +239,8 @@ export const BUILDS: Build[] = [
     hero: img('wordmark-gallery.webp'),
     views: [img('wordmark-home.webp')],
     url: '',
-    featured: 'half',
+    access: 'By request',
+
     about: [
       'One screen. You describe what you want to make and Wordmark returns a real, self-contained page: type, colour, imagery, motion. Then you change anything by selecting it and saying so.',
     ],
@@ -251,7 +260,8 @@ export const BUILDS: Build[] = [
     hero: img('lingua-home.webp'),
     views: [],
     url: '',
-    featured: 'half',
+    access: 'By request',
+
     about: [
       'A conversation app for learning a language with the people who speak it: you write in yours, they read in theirs, and the words you need stay with you.',
     ],
@@ -288,6 +298,7 @@ export const BUILDS: Build[] = [
     hero: img('chip.webp'),
     views: [img('chip-v1.webp'), img('chip-v2.webp')],
     url: '',
+    access: 'Not public yet',
     about: [
       'CHIP is our architecture for running agents: a map of who is working on what, a world state they share, and a security layer for the machine they run on.',
       'The first experiments ran in late 2026. The pictures are design boards; nothing here is production autonomy.',
@@ -327,6 +338,7 @@ export const BUILDS: Build[] = [
     hero: img('pocket.webp'),
     views: [img('pocket-v1.webp'), img('pocket-v2.webp')],
     url: '',
+    access: 'By invitation',
     about: [
       'The phone side of REMIX: your space, your day, the things only you can act on, and a talk that builds. By invitation while it grows.',
     ],
@@ -358,4 +370,23 @@ export const BUILDS: Build[] = [
 ]
 
 export const bySlug = (slug: string) => BUILDS.find((b) => b.slug === slug)
-export const featured = BUILDS.filter((b) => b.featured)
+// The carousel, left to right. MOJIMA first; the rest as Jack sets it.
+export const ORDER = [
+  'mojima',
+  'remix',
+  'deploy',
+  'aeon',
+  'kissa',
+  'kosmo',
+  'lisa',
+  'neko-no-michi',
+  'trendinq',
+  'lingua',
+  'wordmark',
+  'orbit',
+  'chip',
+  'snoei',
+  'pocket',
+  'scout',
+]
+export const CAROUSEL: Build[] = ORDER.map((s) => bySlug(s)).filter((b): b is Build => !!b)
