@@ -94,6 +94,7 @@ export const BUILDS: Build[] = [
     status: 'Live · 2026 pilot',
     year: 2026,
     hero: img('kissa-home.webp'),
+    film: '/film/kissa.mp4',
     views: [img('kissa-desk.webp'), img('kissa-desk2.webp')],
     url: 'https://kissa-site.vercel.app/',
     access: 'The counter and kitchen screens are by request',
