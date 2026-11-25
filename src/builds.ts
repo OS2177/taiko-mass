@@ -71,6 +71,7 @@ export const BUILDS: Build[] = [
     status: 'Live · one restaurant',
     year: 2026,
     hero: img('kosmo-pantry.webp'),
+    film: '/film/kosmo.mp4',
     views: [img('kosmo-larder.webp'), img('kosmo-desk.webp'), img('kosmo-desk2.webp')],
     url: 'https://iaos21.com/kosmo/',
     access: 'The kitchen is by request',
