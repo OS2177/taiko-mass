@@ -318,17 +318,15 @@ export const BUILDS: Build[] = [
 
 export const bySlug = (slug: string) => BUILDS.find((b) => b.slug === slug)
 // The carousel, left to right. MOJIMA first; the rest as Jack sets it.
-// KISSA, Neko no Michi and Orbit stay in BUILDS but are off the carousel; their links get a new place.
+// KISSA, Neko no Michi, Orbit, Lingua and Wordmark stay in BUILDS but are off the carousel; their links get a new place.
 export const ORDER = [
   'mojima',
   'remix',
   'deploy',
   'aeon',
+  'chip',
   'kosmo',
   'lisa',
   'trendinq',
-  'lingua',
-  'wordmark',
-  'chip',
 ]
 export const CAROUSEL: Build[] = ORDER.map((s) => bySlug(s)).filter((b): b is Build => !!b)
