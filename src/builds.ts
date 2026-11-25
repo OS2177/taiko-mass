@@ -314,43 +314,21 @@ export const BUILDS: Build[] = [
       ['Since', '2026'],
     ],
   },
-  {
-    slug: 'scout',
-    name: 'REMIX Scout',
-    line: 'What is now possible, every week',
-    kind: 'system',
-    status: 'Running inside REMIX',
-    year: 2026,
-    hero: img('scout.webp'),
-    views: [img('scout-v1.webp'), img('scout-v2.webp')],
-    url: '',
-    about: [
-      'Scout reads the frontier so you do not have to: new models, new tools, new reach, and what each of them means for the thing you are building.',
-    ],
-    facts: [
-      ['Kind', 'Research subsystem'],
-      ['Where', 'Inside REMIX'],
-      ['Since', '2026'],
-    ],
-  },
 ]
 
 export const bySlug = (slug: string) => BUILDS.find((b) => b.slug === slug)
 // The carousel, left to right. MOJIMA first; the rest as Jack sets it.
+// KISSA, Neko no Michi and Orbit stay in BUILDS but are off the carousel; their links get a new place.
 export const ORDER = [
   'mojima',
   'remix',
   'deploy',
   'aeon',
-  'kissa',
   'kosmo',
   'lisa',
-  'neko-no-michi',
   'trendinq',
   'lingua',
   'wordmark',
-  'orbit',
   'chip',
-  'scout',
 ]
 export const CAROUSEL: Build[] = ORDER.map((s) => bySlug(s)).filter((b): b is Build => !!b)

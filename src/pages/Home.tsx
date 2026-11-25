@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { BUILDS, CAROUSEL, KINDS, bySlug, type Build } from '../builds'
+import { CAROUSEL, KINDS, bySlug, type Build } from '../builds'
 import { Film, OpenLink, converse } from '../components/Parts'
 import { about, closing, hero, heroFrom, site } from '../site'
 import { ArrowRight, Close, Expand, Pause, Play, Shrink, SkipBack, SkipForward } from '../components/icons'
@@ -102,9 +102,9 @@ export function Home() {
 
       <section className="builds" id="builds" aria-label="The builds">
         <div className="section__head">
-          <h2 className="display">Made at iAOS21</h2>
+          <h2 className="display display--sm">made in iaos21</h2>
           <div className="builds__tools">
-            <p className="label muted">{pad(BUILDS.length)} builds</p>
+            <p className="label muted">{pad(CAROUSEL.length)} builds</p>
             <button className="builds__arrow" onClick={() => slide(-1)} aria-label="Previous">
               <ArrowRight size={18} />
             </button>
