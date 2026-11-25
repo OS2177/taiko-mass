@@ -26,15 +26,15 @@ export const card = {
   linkedin: 'https://www.linkedin.com/in/iaos21/',
 }
 
-// The greeter's scripted lines: the welcome and the thank-you cost nothing; only questions go to a model.
+// Jack's agent's scripted lines: the welcome and the thank-you cost nothing; only questions go to the runner.
 export const greeter = {
   hello: [
     'Hi, welcome to iaos21.',
-    'I am the studio\'s greeter. I can answer questions about what we build, and I pass your details on to Jack. Leave your name and email below and he will be in touch himself.',
+    'I am Jack\'s agent. I can answer questions about what we build, and I pass your details on to Jack. Leave your name and email below and he will be in touch himself.',
   ],
   access: (build: string) => [
     `Hi, welcome to iaos21. You are asking for access to ${build}.`,
-    'I am the studio\'s greeter. Leave your name and email below, and tell us what you would like to use it for; Jack opens the door himself and will be in touch.',
+    'I am Jack\'s agent. Leave your name and email below, and tell us what you would like to use it for; Jack opens the door himself and will be in touch.',
   ],
   thanks: (name: string) => `Thank you, ${name}. Your details are with Jack now. He will be in touch.`,
   thanksAccess: (name: string, build: string) => `Thank you, ${name}. Your request for ${build} is with Jack now. He will be in touch.`,
@@ -62,7 +62,7 @@ export const closing = {
 // About Jack, in his words. Change the lines here; nothing else writes about him.
 export const about = {
   eyebrow: 'About',
-  title: 'Every build is an opportunity to dream of a more beautiful human experience.',
+  title: 'Every build is an opportunity to imagine of a more beautiful human experience.',
   paragraphs: [
     'Hi, welcome to iaos21.',
     'A small, independent build studio based in West Flanders, working with AI and guided by a simple intention: to create digital spaces, tools and experiences built around the people who will use them.',

@@ -793,12 +793,14 @@ body {
   display: grid;
   gap: 14px;
   align-content: start;
+  justify-content: center;
+  grid-template-columns: min(520px, 100%); /* one centred column: every line, the form and the ask box share it */
 }
 .cw__stream::-webkit-scrollbar {
   display: none;
 }
 .cw__turn {
-  max-width: 78%;
+  max-width: 86%;
   display: grid;
   gap: 6px;
   font-size: 15px;
@@ -825,8 +827,8 @@ body {
   padding-left: 2px;
 }
 .cw__form {
-  justify-self: start;
-  width: min(420px, 100%);
+  justify-self: stretch;
+  width: 100%;
   display: grid;
   gap: 12px;
   padding: 18px;
@@ -892,8 +894,18 @@ body {
 .cw__ask {
   display: flex;
   gap: 8px;
-  padding: 12px 16px 16px;
+  width: min(520px, 100%);
+  margin: 0 auto;
+  padding: 12px 0 16px;
+}
+.cw__body > .cw__ask {
+  width: 100%;
+  padding: 12px 24px 16px;
   border-top: 1px solid var(--line);
+  justify-content: center;
+}
+.cw__ask input {
+  max-width: calc(520px - 52px);
 }
 .cw__ask input {
   background: rgba(14, 14, 16, 0.72);

@@ -3,8 +3,8 @@ import { card, greeter, site } from '../site'
 import type { Build } from '../builds'
 import { Card, Close, Form, Qr, Send, Tick } from './icons'
 
-// The contact window: a glass chat panel over the astronaut, with the studio's greeter in it.
-// The greeter welcomes, answers questions (through REMIX's sealed studio route) and invites the
+// The contact window: a glass chat panel over the astronaut, with Jack's agent in it.
+// The agent welcomes, answers questions (through REMIX's sealed studio route) and invites the
 // visitor to leave their details. The form sits in the stream; "Send" mails Jack. Two more views
 // sit behind the icons in the title bar: Jack's business card, and a QR that opens this window.
 
@@ -63,7 +63,7 @@ export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?:
       const j = await r.json().catch(() => ({}))
       if (!r.ok) throw new Error()
       if (j?.text) { say(j.text); return }
-      // The greeter answers on Jack's own machine: ask for the words every two seconds, up to ninety.
+      // The agent answers on Jack's own machine: ask for the words every two seconds, up to ninety.
       for (let i = 0; i < 45; i++) {
         await new Promise((ok) => setTimeout(ok, 2000))
         const a = await fetch(site.studioApi, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'answer', id: j.id }) })
