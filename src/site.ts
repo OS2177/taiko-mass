@@ -18,8 +18,9 @@ export const site = {
 // or the poster, or a dark surface when both are empty.
 export const heroFrom = 'https://deploy.iaos21.com/api/hero?site=iaos21'
 export const hero = {
-  video: '',
-  poster: '',
+  // JAKKU, published from DEPLOY on 2026-11-25; the same files, kept here as the fallback
+  video: '/film/hero.mp4',
+  poster: '/film/hero-poster.jpg',
   line: 'A more beautiful future. Made real.',
 }
 
