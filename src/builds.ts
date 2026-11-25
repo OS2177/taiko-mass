@@ -182,8 +182,8 @@ export const BUILDS: Build[] = [
     kind: 'app',
     status: 'In build · first native version',
     year: 2026,
-    hero: img('aeon-soundlab.webp'),
-    views: [img('aeon-decks.webp'), img('aeon-perform.webp'), img('aeon-fm.webp'), img('aeon-arrange.webp'), img('aeon-overview.webp')],
+    hero: img('aeon-splash.webp'),
+    views: [img('aeon-soundlab.webp'), img('aeon-decks.webp'), img('aeon-perform.webp'), img('aeon-fm.webp'), img('aeon-arrange.webp'), img('aeon-overview.webp')],
     url: '',
     access: 'Native app, not public yet',
 
