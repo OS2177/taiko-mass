@@ -91,7 +91,7 @@ export function Home() {
       <section className="hero" id="top">
         <Film video={film.video} poster={film.poster} className="hero__film">
           <div className="hero__words">
-            <p className="label">{site.name} · {site.descriptor.toLowerCase()}</p>
+            <p className="label">{site.name.toLowerCase()} · {site.descriptor}</p>
             <h1 className="display display--xl">{hero.line}</h1>
           </div>
           <a href="/#builds" className="hero__cue label" aria-label="Scroll to the builds">
@@ -141,6 +141,7 @@ export function Home() {
             {about.paragraphs.map((p, i) => (
               <p key={i}>{p}</p>
             ))}
+            <p className="label muted topics__label">{about.writingLabel}</p>
             <ul className="topics">
               {about.writing.map(([t, line, href]) => (
                 <li key={href}>
@@ -148,9 +149,6 @@ export function Home() {
                   <span className="muted"> — {line}</span>
                 </li>
               ))}
-              <li>
-                <a href={site.taikoMass}>Taiko Mass, the original site</a>
-              </li>
             </ul>
             <div className="about__actions">
               <a href={converse()} className="button button--solid">

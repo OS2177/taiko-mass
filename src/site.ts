@@ -2,8 +2,8 @@
 
 export const site = {
   name: 'iAOS21',
-  descriptor: 'Independent building studio',
-  title: 'iAOS21 — an independent building studio',
+  descriptor: 'an independent build studio',
+  title: 'iaos21 — an independent build studio',
   description:
     'iAOS21 is an independent building studio. Intelligent tools, environments and experiences, shaped around the people who will use them.',
   // "Start a conversation" goes here. Change in one place.
@@ -21,7 +21,7 @@ export const hero = {
   // JAKKU, published from DEPLOY on 2026-11-25; the same files, kept here as the fallback
   video: '/film/hero.mp4',
   poster: '/film/hero-poster.jpg',
-  line: 'A more beautiful future. Made real.',
+  line: 'A beautiful future imagined.',
 }
 
 // The closing film, under the builds.
@@ -34,12 +34,12 @@ export const closing = {
 // About Jack, in his words. Change the lines here; nothing else writes about him.
 export const about = {
   eyebrow: 'About',
-  title: 'Every build here started with one person and one unfinished thing.',
+  title: 'Every build is an opportunity to dream of a more beautiful human experience.',
   paragraphs: [
-    'I am Jack. iAOS21 is my studio: a small, independent place where intelligent tools, environments and experiences are built around the people who will use them.',
-    'Before the studio I cooked, and ran a coffee bar. That is where the way of working comes from: build with the cook at the pass, the writer at the desk, the shop at the counter, and hand it over whole.',
-    'Everything on this page was made from REMIX, the environment I built for it, and most of it is open by request.',
+    'Hi, welcome to iaos21: a small, independent build studio based in West Flanders, working with ai and the intention to create digital spaces built around the people who will experience them.',
+    'The studio is imagined by me, Jack, an ai technologist exploring and enjoying the possibilities to be realised through the harnessing of ai and its capabilities.',
   ],
+  writingLabel: 'short essays',
   writing: [
     ['Humanetics', 'Designing intelligent systems to expand human potential', '/humanetics.html'],
     ['The Ecology of Awareness', 'Consciousness in information fields', '/the-ecology-of-awareness.html'],

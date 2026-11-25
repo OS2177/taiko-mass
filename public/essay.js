@@ -20,7 +20,7 @@
 // Same glyph set, same frame maths, same auto-blip cadence, so the nav here
 // behaves exactly like the wordmark on the main site. Keep the two in step.
 (function(){
-  var A = "Taiko Mass", B = "Jack Vintage";
+  var A = "iaos21", B = "Jack Vintage";
   var GLYPHS = "!<>-_\\/[]{}—=+*^?#________";
   var RETURN_SCALE = 8 / 3;  // return scramble runs 2.67x the flip out
   var el = document.querySelector(".site-nav .gw");

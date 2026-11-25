@@ -658,6 +658,9 @@ body {
   line-height: 1.6;
   max-width: 62ch;
 }
+.topics__label {
+  margin-top: 8px;
+}
 .topics {
   display: grid;
   gap: 6px;
