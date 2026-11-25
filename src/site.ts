@@ -36,8 +36,9 @@ export const about = {
   eyebrow: 'About',
   title: 'Every build is an opportunity to dream of a more beautiful human experience.',
   paragraphs: [
-    'Hi, welcome to iaos21: a small, independent build studio based in West Flanders, working with ai and the intention to create digital spaces built around the people who will experience them.',
-    'The studio is imagined by me, Jack, an ai technologist exploring and enjoying the possibilities to be realised through the harnessing of ai and its capabilities.',
+    'Hi, welcome to iaos21.',
+    'A small, independent build studio based in West Flanders, working with AI and guided by a simple intention: to create digital spaces, tools and experiences built around the people who will use them.',
+    'The studio is imagined by me, Jack, an AI technologist exploring and enjoying the creative possibilities that emerge when human imagination meets the capabilities of artificial intelligence.',
   ],
   writingLabel: 'short essays',
   writing: [
