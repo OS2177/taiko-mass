@@ -11,6 +11,29 @@ export const site = {
   remix: 'https://remix.iaos21.com',
   taikoMass: '/taiko-mass/',
   linkedin: 'https://www.linkedin.com/in/iaos21/',
+  // The contact window talks to this one route in REMIX (api/studio.ts there): the greeter and the form.
+  studioApi: 'https://remix.iaos21.com/api/studio',
+}
+
+// Jack's business card, shown in the contact window and behind the QR he scans from his phone.
+export const card = {
+  name: 'Jack Vintage',
+  role: 'AI technologist',
+  studio: 'iaos21 · an independent build studio',
+  where: 'West Flanders, Belgium',
+  email: 'jack@iaos21.com',
+  web: 'iaos21.com',
+  linkedin: 'https://www.linkedin.com/in/iaos21/',
+}
+
+// The greeter's scripted lines: the welcome and the thank-you cost nothing; only questions go to a model.
+export const greeter = {
+  hello: [
+    'Hi, welcome to iaos21.',
+    'I am the studio\'s greeter. I can answer questions about what we build, and I pass your details on to Jack. Leave your name and email below and he will be in touch himself.',
+  ],
+  thanks: (name: string) => `Thank you, ${name}. Your details are with Jack now. He will be in touch.`,
+  offline: 'I cannot answer that right now. Leave your details in the form and Jack will reply himself.',
 }
 
 // The opening film, made in DEPLOY. Live in the cockpit publishes it to iaos21.com and the page reads it

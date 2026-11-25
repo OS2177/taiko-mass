@@ -61,3 +61,18 @@ export const Shrink = ({ size = 18 }: P) => (
     <path d="M9 4v5H4M15 4v5h5M9 20v-5H4M15 20v-5h5" />
   </svg>
 )
+export const Card = ({ size = 18 }: P) => (
+  <svg {...base(size)}><rect x="3" y="6" width="18" height="12" rx="2" /><path d="M7 10h4M7 13h7" /></svg>
+)
+export const Form = ({ size = 18 }: P) => (
+  <svg {...base(size)}><path d="M5 4h14v16H5z" /><path d="M8 9h8M8 12h8M8 15h5" /></svg>
+)
+export const Qr = ({ size = 18 }: P) => (
+  <svg {...base(size)}><rect x="4" y="4" width="6" height="6" /><rect x="14" y="4" width="6" height="6" /><rect x="4" y="14" width="6" height="6" /><path d="M14 14h2v2h-2zM18 14h2M14 18h2M18 18h2v2" /></svg>
+)
+export const Send = ({ size = 18 }: P) => (
+  <svg {...base(size)}><path d="M5 12h13M13 6l6 6-6 6" /></svg>
+)
+export const Tick = ({ size = 18 }: P) => (
+  <svg {...base(size)}><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+)

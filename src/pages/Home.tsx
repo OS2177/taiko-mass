@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { CAROUSEL, KINDS, bySlug, type Build } from '../builds'
 import { Film, OpenLink, converse } from '../components/Parts'
 import { about, closing, hero, heroFrom, site } from '../site'
+import { Contact } from '../components/Contact'
 import { ArrowRight, Close, Expand, Pause, Play, Shrink, SkipBack, SkipForward } from '../components/icons'
 
 const pad = (n: number) => String(n).padStart(2, '0')
@@ -18,11 +19,12 @@ function slugFromAddress(): string | null {
 // in place), the closing film, a few words about Jack. The bar lives in App.
 export function Home() {
   const [open, setOpen] = useState<string | null>(slugFromAddress)
+  const [contact, setContact] = useState(() => location.hash === '#contact')
   const scroller = useRef<HTMLDivElement>(null)
 
   // Back/forward and typed addresses open or close the card
   useEffect(() => {
-    const read = () => setOpen(slugFromAddress())
+    const read = () => { setOpen(slugFromAddress()); setContact(location.hash === '#contact') }
     window.addEventListener('popstate', read)
     window.addEventListener('hashchange', read)
     return () => {
@@ -123,6 +125,7 @@ export function Home() {
       </section>
 
       {current && <Journey key={current.slug} b={current} onClose={close} />}
+      {contact && <Contact onClose={() => { setContact(false); history.replaceState(null, '', '/') }} />}
 
       {(closing.video || closing.poster) && (
         <section className="closing" aria-label="Closing film">
@@ -150,14 +153,6 @@ export function Home() {
                 </li>
               ))}
             </ul>
-            <div className="about__actions">
-              <a href={converse()} className="button button--solid">
-                Start a conversation
-              </a>
-              <a href={site.remix} target="_blank" rel="noopener noreferrer" className="button" id="remix">
-                REMIX
-              </a>
-            </div>
           </div>
         </div>
       </section>

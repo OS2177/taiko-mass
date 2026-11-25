@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { nav, site } from '../site'
 import { Link } from '../lib/router'
 import { Logo } from './Logo'
-import { converse } from './Parts'
 import { ArrowUpRight } from './icons'
 
 // The bar at the bottom of the screen. It stands in for header and footer both, and stays out of
@@ -25,7 +24,7 @@ export function Bar() {
           </li>
         ))}
         <li>
-          <a href={converse()}>Contact</a>
+          <a href="/#contact">Contact</a>
         </li>
         <li className="bar__remix">
           <a href={site.remix} target="_blank" rel="noopener noreferrer">
