@@ -138,6 +138,8 @@ export const BUILDS: Build[] = [
     hero: img('mojima-door.webp'),
     views: [img('mojima.webp'), img('mojima-v1.webp')],
     url: 'https://iaos21.com/mojima/',
+    film: '/film/mojima.mp4',
+    access: 'By request',
 
     about: [
       'Mojima is a writing space for deeper thinking, clearer expression and a more intentional you. A studio for the writing itself and a tour of what it can hold.',
