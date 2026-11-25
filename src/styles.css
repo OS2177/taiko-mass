@@ -276,9 +276,12 @@ body {
   margin-right: calc(-1 * var(--gutter));
   padding-left: var(--gutter);
   padding-right: var(--gutter);
-  background: color-mix(in srgb, var(--bg) 70%, transparent);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  /* The glass fades in with the scroll (0 at the top, full once the hero's words are gone), so the
+     sections settle gently over the film instead of arriving with a hard edge */
+  --glass: clamp(0, var(--hero-scroll, 0) / var(--hero-fade, 520), 1);
+  background: color-mix(in srgb, var(--bg) calc(70% * var(--glass)), transparent);
+  backdrop-filter: blur(calc(8px * var(--glass)));
+  -webkit-backdrop-filter: blur(calc(8px * var(--glass)));
 }
 .builds {
   border-top: 1px solid var(--line);
