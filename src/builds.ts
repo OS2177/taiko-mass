@@ -4,7 +4,7 @@
 // kind      → 'app' (Applications) | 'system' (Intelligent systems) | 'exploration' (Explorations)
 // status    → short, honest: what the thing is today
 // year      → when it was started
-// hero      → the main screenshot (wide; a 16:10 crop of it is what the cards show)
+// hero      → the main screenshot (wide, 1920×890 like a landing page; the cards show all of it)
 // views     → more screens of the same build, shown when the card is opened
 // url       → the real address, or '' when there is nothing public to open yet
 // film      → the run-through: a short recorded walk through the build (mp4/webm in /film/), or . when not recorded yet

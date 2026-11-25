@@ -331,7 +331,7 @@ body {
 .card__frame {
   display: block;
   position: relative;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 1920 / 890; /* the shape of the landing screenshots: the whole hero shows, nothing cut */
   overflow: hidden;
   border-radius: var(--radius);
   border: 1px solid var(--line);
@@ -348,8 +348,8 @@ body {
 .card__frame img {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  object-position: top center;
+  object-fit: contain;
+  object-position: center;
   transition: transform 0.6s ease;
 }
 .card:hover .card__frame img {
