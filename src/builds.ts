@@ -47,6 +47,7 @@ export const BUILDS: Build[] = [
     status: 'Live · in daily use',
     year: 2026,
     hero: img('remix-home.webp'),
+    film: '/film/remix.mp4',
     views: [img('remix-desk.webp'), img('remix-desk2.webp'), img('remix-dunes2.webp'), img('remix-phone.webp')],
     url: 'https://remix.iaos21.com',
     access: 'By invitation',
