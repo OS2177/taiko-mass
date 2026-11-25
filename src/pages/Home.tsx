@@ -19,7 +19,6 @@ function slugFromAddress(): string | null {
 export function Home() {
   const [open, setOpen] = useState<string | null>(slugFromAddress)
   const scroller = useRef<HTMLDivElement>(null)
-  const panel = useRef<HTMLElement>(null)
 
   // Back/forward and typed addresses open or close the card
   useEffect(() => {
@@ -32,11 +31,17 @@ export function Home() {
     }
   }, [])
 
-  // The opened card gets its own address and comes into view
+  // The opened card gets its own address; the page behind the window holds still; Esc closes it
   useEffect(() => {
     if (!open) return
     if (location.hash.slice(1) !== open) history.replaceState(null, '', `/#${open}`)
-    requestAnimationFrame(() => panel.current?.scrollIntoView({ behavior: 'smooth', block: 'start' }))
+    document.body.style.overflow = 'hidden'
+    const key = (e: KeyboardEvent) => { if (e.key === 'Escape') close() }
+    window.addEventListener('keydown', key)
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', key)
+    }
   }, [open])
 
   function close() {
@@ -87,12 +92,9 @@ export function Home() {
           ))}
         </div>
 
-        {current && (
-          <article className="journey" ref={panel} id={`journey-${current.slug}`} aria-label={`${current.name}, the run-through`}>
-            <Journey b={current} onClose={close} />
-          </article>
-        )}
       </section>
+
+      {current && <Journey key={current.slug} b={current} onClose={close} />}
 
       <section className="closing" aria-label="Closing film">
         <Film video={closing.video} poster={closing.poster} className="closing__film" />
@@ -159,57 +161,54 @@ function Card({ b, eager, open, onOpen }: { b: Build; eager: boolean; open: bool
   )
 }
 
-// The opened card: the run-through plays on the left (or the stills, until it is recorded),
-// the words and the way in on the right.
+// The opened card: a window over the page, the way the build looks when it is open on your screen.
+// The walk-through starts by itself and keeps going, no controls; until it is recorded, the stills take turns.
 function Journey({ b, onClose }: { b: Build; onClose: () => void }) {
-  const [still, setStill] = useState(b.hero)
   const stills = [b.hero, ...b.views]
+  const [i, setI] = useState(0)
+  useEffect(() => {
+    if (b.film || stills.length < 2) return
+    const t = window.setInterval(() => setI((n) => (n + 1) % stills.length), 2800)
+    return () => window.clearInterval(t)
+  }, [b.film, stills.length])
+  const address = b.url ? b.url.replace(/^https?:\/\//, '').replace(/\/$/, '') : `${b.name.toLowerCase()} · not public yet`
   return (
-    <>
-      <div className="journey__film">
-        {b.film ? (
-          <video key={b.film} src={b.film} poster={b.hero} muted autoPlay loop playsInline controls preload="metadata" />
-        ) : (
-          <>
-            <img key={still} src={still} alt="" />
-            {stills.length > 1 && (
-              <ul className="journey__stills" aria-label="More views">
-                {stills.map((s) => (
-                  <li key={s}>
-                    <button onClick={() => setStill(s)} aria-pressed={still === s} aria-label="Show this view">
-                      <img src={s} alt="" loading="lazy" />
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </>
-        )}
-      </div>
-      <div className="journey__text">
-        <button className="journey__close" onClick={onClose} aria-label="Close">
-          <Close size={20} />
-        </button>
-        <p className="label muted">
-          {KINDS[b.kind]} · {b.status}
-        </p>
-        <h3 className="display">{b.name}</h3>
-        <p className="journey__line">{b.line}</p>
-        {b.about.map((p, i) => (
-          <p key={i} className="muted">
-            {p}
-          </p>
-        ))}
-        {!b.film && <p className="label muted journey__soon">Run-through coming</p>}
-        <div className="journey__actions">
-          {b.url && <OpenLink href={b.url}>Open {b.name}</OpenLink>}
-          {b.access && (
-            <a className="button" href={converse(`${b.name}: ${b.access.toLowerCase()}`)}>
-              {b.access}
-            </a>
+    <div className="pop" role="dialog" aria-modal="true" aria-label={`${b.name}, the walk-through`} onClick={onClose}>
+      <div className="pop__window" onClick={(e) => e.stopPropagation()}>
+        <div className="pop__bar">
+          <span className="pop__dots" aria-hidden="true">
+            <i /><i /><i />
+          </span>
+          <span className="pop__address label">{address}</span>
+          <button className="pop__close" onClick={onClose} aria-label="Close">
+            <Close size={18} />
+          </button>
+        </div>
+        <div className="pop__screen">
+          {b.film ? (
+            <video src={b.film} poster={b.hero} muted autoPlay loop playsInline preload="auto" disablePictureInPicture />
+          ) : (
+            <img key={stills[i]} src={stills[i]} alt="" />
           )}
         </div>
+        <div className="pop__foot">
+          <div className="pop__words">
+            <p className="label muted">
+              {KINDS[b.kind]} · {b.status}
+            </p>
+            <h3 className="pop__name">{b.name}</h3>
+            <p className="muted">{b.about[0]}</p>
+          </div>
+          <div className="pop__actions">
+            {b.url && <OpenLink href={b.url}>Open {b.name}</OpenLink>}
+            {b.access && (
+              <a className="button" href={converse(`${b.name}: ${b.access.toLowerCase()}`)}>
+                {b.access}
+              </a>
+            )}
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   )
 }
