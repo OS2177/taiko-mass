@@ -141,7 +141,7 @@ export const BUILDS: Build[] = [
     year: 2026,
     hero: img('mojima-door.webp'),
     views: [img('mojima.webp'), img('mojima-v1.webp')],
-    url: 'https://iaos21.com/mojima/',
+    url: 'https://mojima.iaos21.com/',
     film: '/film/mojima.mp4',
     access: 'By request',
 

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { card, greeter, site } from '../site'
+import type { Build } from '../builds'
 import { Card, Close, Form, Qr, Send, Tick } from './icons'
 
 // The contact window: a glass chat panel over the astronaut, with the studio's greeter in it.
@@ -12,9 +13,9 @@ type View = 'form' | 'card' | 'qr'
 
 const address = () => `${location.origin}/#contact`
 
-export function Contact({ onClose }: { onClose: () => void }) {
+export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?: Build }) {
   const [view, setView] = useState<View>('form')
-  const [turns, setTurns] = useState<Turn[]>(() => greeter.hello.map((text) => ({ who: 'runner', text })))
+  const [turns, setTurns] = useState<Turn[]>(() => (forBuild ? greeter.access(forBuild.name) : greeter.hello).map((text) => ({ who: 'runner', text })))
   const [typing, setTyping] = useState(false)
   const [sent, setSent] = useState<string | null>(null)
   const [sending, setSending] = useState(false)
@@ -33,14 +34,18 @@ export function Contact({ onClose }: { onClose: () => void }) {
     const email = String(f.get('email') ?? '').trim()
     const work = String(f.get('work') ?? '').trim()
     const message = String(f.get('message') ?? '').trim()
+    const access = String(f.get('access') ?? '').trim()
+    const why = String(f.get('why') ?? '').trim()
     if (!name || !email) { setProblem('Your name and email are needed.'); return }
+    if (forBuild && !why) { setProblem('Say what you would like to use it for.'); return }
     setSending(true); setProblem(null)
     try {
-      const r = await fetch(site.studioApi, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'send', name, email, work, message }) })
+      const r = await fetch(site.studioApi, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'send', name, email, work, message, access, why }) })
       const j = await r.json().catch(() => ({}))
       if (!r.ok) throw new Error(j?.error || 'That did not go through.')
       setSent(name)
-      setTurns((t) => [...t, { who: 'runner', text: greeter.thanks(name.split(' ')[0] || name) }])
+      const first = name.split(' ')[0] || name
+      setTurns((t) => [...t, { who: 'runner', text: forBuild ? greeter.thanksAccess(first, access || forBuild.name) : greeter.thanks(first) }])
     } catch (err: any) {
       setProblem(err?.message || 'That did not go through. Try again in a moment.')
     } finally { setSending(false) }
@@ -52,12 +57,23 @@ export function Contact({ onClose }: { onClose: () => void }) {
     if (!text || typing) return
     const next: Turn[] = [...turns, { who: 'visitor', text }]
     setTurns(next); setAsk(''); setTyping(true)
+    const say = (t: string) => setTurns((cur) => [...cur, { who: 'runner', text: t }])
     try {
       const r = await fetch(site.studioApi, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'ask', turns: next.slice(-12) }) })
       const j = await r.json().catch(() => ({}))
-      setTurns((t) => [...t, { who: 'runner', text: (r.ok && j?.text) || greeter.offline }])
+      if (!r.ok) throw new Error()
+      if (j?.text) { say(j.text); return }
+      // The greeter answers on Jack's own machine: ask for the words every two seconds, up to ninety.
+      for (let i = 0; i < 45; i++) {
+        await new Promise((ok) => setTimeout(ok, 2000))
+        const a = await fetch(site.studioApi, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'answer', id: j.id }) })
+        const w = await a.json().catch(() => ({}))
+        if (!a.ok) throw new Error()
+        if (w?.text) { say(w.text); return }
+      }
+      say(greeter.offline)
     } catch {
-      setTurns((t) => [...t, { who: 'runner', text: greeter.offline }])
+      say(greeter.offline)
     } finally { setTyping(false) }
   }
 
@@ -102,7 +118,14 @@ export function Contact({ onClose }: { onClose: () => void }) {
                     <label><span className="label muted">Name</span><input name="name" autoComplete="name" required maxLength={80} /></label>
                     <label><span className="label muted">Email</span><input name="email" type="email" autoComplete="email" required maxLength={160} /></label>
                     <label><span className="label muted">Work</span><input name="work" autoComplete="organization" maxLength={160} placeholder="What you do, where" /></label>
-                    <label><span className="label muted">Anything you want to say</span><textarea name="message" rows={3} maxLength={1500} /></label>
+                    {forBuild ? (
+                      <>
+                        <label><span className="label muted">Access to</span><input name="access" defaultValue={forBuild.name} maxLength={120} /></label>
+                        <label><span className="label muted">What would you like to use it for?</span><textarea name="why" rows={3} maxLength={1500} required /></label>
+                      </>
+                    ) : (
+                      <label><span className="label muted">Anything you want to say</span><textarea name="message" rows={3} maxLength={1500} /></label>
+                    )}
                     {problem && <p className="cw__problem">{problem}</p>}
                     <button className="button button--solid" type="submit" disabled={sending}>{sending ? 'Sending…' : 'Send'}</button>
                   </form>

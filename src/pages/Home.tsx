@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { CAROUSEL, KINDS, bySlug, type Build } from '../builds'
-import { Film, OpenLink, converse } from '../components/Parts'
+import { Film, OpenLink } from '../components/Parts'
 import { about, closing, hero, heroFrom, site } from '../site'
 import { Contact } from '../components/Contact'
 import { ArrowRight, Close, Expand, Pause, Play, Shrink, SkipBack, SkipForward } from '../components/icons'
@@ -15,16 +15,24 @@ function slugFromAddress(): string | null {
   return m && bySlug(m[1]) ? m[1] : null
 }
 
+// The contact window: /#contact, or /#contact:<build> when a visitor asks for access to one.
+function contactFromAddress(): string | false {
+  const h = location.hash.slice(1)
+  if (h === 'contact') return ''
+  if (h.startsWith('contact:')) return h.slice(8)
+  return false
+}
+
 // The one page: the hero film, the builds as a carousel (click one and its run-through opens
 // in place), the closing film, a few words about Jack. The bar lives in App.
 export function Home() {
   const [open, setOpen] = useState<string | null>(slugFromAddress)
-  const [contact, setContact] = useState(() => location.hash === '#contact')
+  const [contact, setContact] = useState<string | false>(contactFromAddress)
   const scroller = useRef<HTMLDivElement>(null)
 
   // Back/forward and typed addresses open or close the card
   useEffect(() => {
-    const read = () => { setOpen(slugFromAddress()); setContact(location.hash === '#contact') }
+    const read = () => { setOpen(slugFromAddress()); setContact(contactFromAddress()) }
     window.addEventListener('popstate', read)
     window.addEventListener('hashchange', read)
     return () => {
@@ -125,7 +133,7 @@ export function Home() {
       </section>
 
       {current && <Journey key={current.slug} b={current} onClose={close} />}
-      {contact && <Contact onClose={() => { setContact(false); history.replaceState(null, '', '/') }} />}
+      {contact !== false && <Contact key={contact} forBuild={contact ? bySlug(contact) : undefined} onClose={() => { setContact(false); history.replaceState(null, '', '/') }} />}
 
       {(closing.video || closing.poster) && (
         <section className="closing" aria-label="Closing film">
@@ -286,7 +294,7 @@ function Journey({ b, onClose }: { b: Build; onClose: () => void }) {
           <div className="pop__actions">
             {b.url && <OpenLink href={b.url}>Open {b.name}</OpenLink>}
             {b.access && (
-              <a className="button" href={converse(`${b.name}: ${b.access.toLowerCase()}`)}>
+              <a className="button" href={`/#contact:${b.slug}`}>
                 {b.access}
               </a>
             )}
