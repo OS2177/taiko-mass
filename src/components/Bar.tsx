@@ -1,14 +1,22 @@
+import { useEffect, useState } from 'react'
 import { nav, site } from '../site'
 import { Link } from '../lib/router'
 import { Logo } from './Logo'
 import { converse } from './Parts'
 import { ArrowUpRight } from './icons'
 
-// The bar at the bottom of the screen. It never moves and stands in for header and footer both:
-// the hero film above it stays clean. Links are places on the one page.
+// The bar at the bottom of the screen. It stands in for header and footer both, and stays out of
+// sight until the visitor starts to scroll, so the hero film opens clean. Links are places on the one page.
 export function Bar() {
+  const [shown, setShown] = useState(false)
+  useEffect(() => {
+    const onScroll = () => setShown(window.scrollY > 24)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
   return (
-    <nav className="bar" aria-label="Main">
+    <nav className={shown ? 'bar' : 'bar bar--hidden'} aria-label="Main">
       <Logo />
       <ul className="bar__links">
         {nav.map((n) => (

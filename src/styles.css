@@ -185,16 +185,19 @@ body {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-top: 1px solid var(--line);
+  transition: transform 0.35s ease, opacity 0.35s ease;
+}
+.bar--hidden {
+  transform: translateY(100%);
+  opacity: 0;
+  pointer-events: none;
 }
 .logo {
   font-family: var(--tight);
   font-weight: 600;
   font-size: 18px;
   letter-spacing: -0.02em;
-}
-.logo span {
-  font-weight: 400;
-  color: var(--muted);
+  color: var(--text);
 }
 .bar__links {
   display: flex;
@@ -240,7 +243,7 @@ body {
   /* The opening: a spacer the height of the first screen. The film itself is fixed to the
      viewport and stays behind everything that scrolls over it, bar included. */
   margin: 0 calc(-1 * var(--gutter));
-  height: calc(100svh - var(--bar));
+  height: 100svh; /* the bar is hidden on the opening screen, so the hero takes the whole of it */
   min-height: 520px;
 }
 .hero__film {
