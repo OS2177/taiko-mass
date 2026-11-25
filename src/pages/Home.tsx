@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { BUILDS, CAROUSEL, KINDS, bySlug, type Build } from '../builds'
 import { Film, OpenLink, converse } from '../components/Parts'
-import { about, closing, hero, site } from '../site'
+import { about, closing, hero, heroFrom, site } from '../site'
 import { ArrowRight, Close, Expand, Pause, Play, Shrink, SkipBack, SkipForward } from '../components/icons'
 
 const pad = (n: number) => String(n).padStart(2, '0')
@@ -58,10 +58,22 @@ export function Home() {
 
   const current = open ? bySlug(open) : undefined
 
+  // The film published from DEPLOY's Live (site 'iaos21'); the one in site.ts until it answers.
+  const [film, setFilm] = useState({ video: hero.video, poster: hero.poster })
+  useEffect(() => {
+    void fetch(heroFrom).then((r) => (r.ok ? r.json() : null)).then((j) => {
+      const h = j?.hero
+      if (!h?.video) return
+      const upright = matchMedia('(orientation: portrait) and (max-width: 820px)').matches
+      const pick = upright && h.phone?.video ? h.phone : h
+      setFilm({ video: pick.video, poster: pick.poster ?? '' })
+    }).catch(() => {})
+  }, [])
+
   return (
     <>
       <section className="hero" id="top">
-        <Film video={hero.video} poster={hero.poster} className="hero__film">
+        <Film video={film.video} poster={film.poster} className="hero__film">
           <div className="hero__words">
             <p className="label">{site.name} · {site.descriptor.toLowerCase()}</p>
             <h1 className="display display--xl">{hero.line}</h1>

@@ -13,8 +13,10 @@ export const site = {
   linkedin: 'https://www.linkedin.com/in/iaos21/',
 }
 
-// The opening film, made in DEPLOY. Put the file in /public/film/ and name it here.
-// While there is no film yet the page shows the poster (or a dark surface when that is empty too).
+// The opening film, made in DEPLOY. Live in the cockpit publishes it to iaos21.com and the page reads it
+// from `heroFrom` at load; until then (or if DEPLOY can't be reached) it plays the file named here,
+// or the poster, or a dark surface when both are empty.
+export const heroFrom = 'https://deploy.iaos21.com/api/hero?site=iaos21'
 export const hero = {
   video: '',
   poster: '',
