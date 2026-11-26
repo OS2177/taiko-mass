@@ -4,17 +4,24 @@ import type { Build } from '../builds'
 import { Card, Close, Form, Qr, Send, Tick } from './icons'
 
 // The contact window: a glass chat panel over the astronaut, with Jack's agent in it.
-// The agent welcomes, answers questions (through REMIX's sealed studio route) and invites the
-// visitor to leave their details. The form sits in the stream; "Send" mails Jack. Two more views
-// sit behind the icons in the title bar: Jack's business card, and a QR that opens this window.
+// The agent welcomes and asks: a question, or leave your details? Questions go through
+// REMIX's sealed studio route and come back into the stream, the ask box always at the
+// bottom. When the visitor wants to leave their details, or the agent hands over (its answer
+// ends with the reach mark), the agent wishes them a nice day and the form takes the window;
+// "Send" mails Jack. Two more views sit behind the icons in the title bar: Jack's business
+// card, and a QR that opens this window. (Jack, 2026-11-26: the form used to sit in the
+// stream above the ask box, so a visitor's own words vanished under it.)
 
 type Turn = { who: 'visitor' | 'runner'; text: string }
-type View = 'form' | 'card' | 'qr'
+type View = 'chat' | 'form' | 'card' | 'qr'
 
 const address = () => `${location.origin}/#contact`
+/** The agent ends an answer with this when the visitor should be handed the form (runner/greeter.mjs in REMIX). */
+const REACH = /<!--\s*reach\s*-->/i
+const clean = (t: string) => t.replace(/<!--[\s\S]*?-->/g, '').trim()
 
 export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?: Build }) {
-  const [view, setView] = useState<View>('form')
+  const [view, setView] = useState<View>('chat')
   const [turns, setTurns] = useState<Turn[]>(() => (forBuild ? greeter.access(forBuild.name) : greeter.hello).map((text) => ({ who: 'runner', text })))
   const [typing, setTyping] = useState(false)
   const [sent, setSent] = useState<string | null>(null)
@@ -22,9 +29,16 @@ export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?:
   const [problem, setProblem] = useState<string | null>(null)
   const [ask, setAsk] = useState('')
   const stream = useRef<HTMLDivElement>(null)
+  const input = useRef<HTMLInputElement>(null)
+  const opening = (forBuild ? greeter.access(forBuild.name) : greeter.hello).length
+  const fresh = turns.length <= opening && !sent
 
   // The newest line stays in view
-  useEffect(() => { stream.current?.scrollTo({ top: stream.current.scrollHeight, behavior: 'smooth' }) }, [turns, typing, sent])
+  useEffect(() => { stream.current?.scrollTo({ top: stream.current.scrollHeight, behavior: 'smooth' }) }, [turns, typing, view])
+
+  const say = (t: string) => setTurns((cur) => [...cur, { who: 'runner', text: t }])
+  /** The agent hands over: a last line, then the form. */
+  const handOver = (line = greeter.bye) => { say(line); setTimeout(() => setView('form'), 900) }
 
   async function send(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -45,7 +59,8 @@ export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?:
       if (!r.ok) throw new Error(j?.error || 'That did not go through.')
       setSent(name)
       const first = name.split(' ')[0] || name
-      setTurns((t) => [...t, { who: 'runner', text: forBuild ? greeter.thanksAccess(first, access || forBuild.name) : greeter.thanks(first) }])
+      say(forBuild ? greeter.thanksAccess(first, access || forBuild.name) : greeter.thanks(first))
+      setView('chat')
     } catch (err: any) {
       setProblem(err?.message || 'That did not go through. Try again in a moment.')
     } finally { setSending(false) }
@@ -57,27 +72,29 @@ export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?:
     if (!text || typing) return
     const next: Turn[] = [...turns, { who: 'visitor', text }]
     setTurns(next); setAsk(''); setTyping(true)
-    const say = (t: string) => setTurns((cur) => [...cur, { who: 'runner', text: t }])
     try {
       const r = await fetch(site.studioApi, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'ask', turns: next.slice(-12) }) })
       const j = await r.json().catch(() => ({}))
       if (!r.ok) throw new Error()
-      if (j?.text) { say(j.text); return }
+      let words: string | null = j?.text ? String(j.text) : null
       // The agent answers on Jack's own machine: ask for the words every two seconds, up to ninety.
-      for (let i = 0; i < 45; i++) {
+      for (let i = 0; words === null && i < 45; i++) {
         await new Promise((ok) => setTimeout(ok, 2000))
         const a = await fetch(site.studioApi, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'answer', id: j.id }) })
         const w = await a.json().catch(() => ({}))
         if (!a.ok) throw new Error()
-        if (w?.text) { say(w.text); return }
+        if (w?.text) words = String(w.text)
       }
-      say(greeter.offline)
+      if (words === null) { if (!sent) handOver(greeter.offline); else say(greeter.offline); return }
+      // The agent's hand-over: its words, then the form
+      if (REACH.test(words) && !sent) handOver(clean(words))
+      else say(clean(words))
     } catch {
-      say(greeter.offline)
+      if (!sent) handOver(greeter.offline); else say(greeter.offline)
     } finally { setTyping(false) }
   }
 
-  const toggle = (v: View) => setView((cur) => (cur === v ? 'form' : v))
+  const toggle = (v: Exclude<View, 'chat' | 'form'>) => setView((cur) => (cur === v ? 'chat' : v))
 
   return (
     <div className="pop" role="dialog" aria-modal="true" aria-label="Contact the studio" onClick={onClose}>
@@ -86,7 +103,7 @@ export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?:
           <span className="pop__dots" aria-hidden="true"><i /><i /><i /></span>
           <span className="pop__address label">iaos21 · contact</span>
           <span className="cw__tools">
-            <button className={`cw__tool${view === 'card' ? ' is-on' : ''}`} onClick={() => toggle('card')} aria-pressed={view === 'card'} title={view === 'card' ? 'Back to the form' : 'Business card'}>
+            <button className={`cw__tool${view === 'card' ? ' is-on' : ''}`} onClick={() => toggle('card')} aria-pressed={view === 'card'} title={view === 'card' ? 'Back to the chat' : 'Business card'}>
               {view === 'card' ? <Form /> : <Card />}
             </button>
             <button className={`cw__tool${view === 'qr' ? ' is-on' : ''}`} onClick={() => toggle('qr')} aria-pressed={view === 'qr'} title={view === 'qr' ? 'Close the code' : 'A code to scan: it opens this window'}>
@@ -100,6 +117,29 @@ export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?:
           {view === 'card' && <BusinessCard />}
           {view === 'qr' && <ScanCode />}
           {view === 'form' && (
+            <div className="cw__stream cw__formview">
+              <form className="cw__form" onSubmit={send}>
+                <p className="label muted">{forBuild ? `Access to ${forBuild.name}` : 'Your details, for Jack'}</p>
+                <label><span className="label muted">Name</span><input name="name" autoComplete="name" required maxLength={80} autoFocus /></label>
+                <label><span className="label muted">Email</span><input name="email" type="email" autoComplete="email" required maxLength={160} /></label>
+                <label><span className="label muted">Work</span><input name="work" autoComplete="organization" maxLength={160} placeholder="What you do, where" /></label>
+                {forBuild ? (
+                  <>
+                    <label><span className="label muted">Access to</span><input name="access" defaultValue={forBuild.name} maxLength={120} /></label>
+                    <label><span className="label muted">What would you like to use it for?</span><textarea name="why" rows={3} maxLength={1500} required /></label>
+                  </>
+                ) : (
+                  <label><span className="label muted">Anything you want to say</span><textarea name="message" rows={3} maxLength={1500} /></label>
+                )}
+                {problem && <p className="cw__problem">{problem}</p>}
+                <div className="cw__form-row">
+                  <button className="button button--solid" type="submit" disabled={sending}>{sending ? 'Sending…' : 'Send'}</button>
+                  <button className="cw__back" type="button" onClick={() => setView('chat')}>Back to the chat</button>
+                </div>
+              </form>
+            </div>
+          )}
+          {view === 'chat' && (
             <>
               <div className="cw__stream" ref={stream}>
                 {turns.map((t, i) => (
@@ -108,32 +148,22 @@ export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?:
                     <p>{t.text}</p>
                   </div>
                 ))}
-                {sent ? (
+                {fresh && !typing && (
+                  <div className="cw__chips">
+                    <button type="button" onClick={() => handOver()}>{forBuild ? greeter.leaveFor(forBuild.name) : greeter.leave}</button>
+                    <button type="button" onClick={() => input.current?.focus()}>{greeter.askFirst}</button>
+                  </div>
+                )}
+                {sent && (
                   <div className="cw__done" role="status">
                     <span className="cw__tick"><Tick size={16} /></span>
                     <span>Sent. Jack will be in touch.</span>
                   </div>
-                ) : (
-                  <form className="cw__form" onSubmit={send}>
-                    <label><span className="label muted">Name</span><input name="name" autoComplete="name" required maxLength={80} /></label>
-                    <label><span className="label muted">Email</span><input name="email" type="email" autoComplete="email" required maxLength={160} /></label>
-                    <label><span className="label muted">Work</span><input name="work" autoComplete="organization" maxLength={160} placeholder="What you do, where" /></label>
-                    {forBuild ? (
-                      <>
-                        <label><span className="label muted">Access to</span><input name="access" defaultValue={forBuild.name} maxLength={120} /></label>
-                        <label><span className="label muted">What would you like to use it for?</span><textarea name="why" rows={3} maxLength={1500} required /></label>
-                      </>
-                    ) : (
-                      <label><span className="label muted">Anything you want to say</span><textarea name="message" rows={3} maxLength={1500} /></label>
-                    )}
-                    {problem && <p className="cw__problem">{problem}</p>}
-                    <button className="button button--solid" type="submit" disabled={sending}>{sending ? 'Sending…' : 'Send'}</button>
-                  </form>
                 )}
                 {typing && <div className="cw__turn cw__turn--runner"><p className="muted">…</p></div>}
               </div>
               <form className="cw__ask" onSubmit={question}>
-                <input value={ask} onChange={(e) => setAsk(e.target.value)} placeholder="Ask about the studio" maxLength={600} aria-label="Ask a question" />
+                <input ref={input} value={ask} onChange={(e) => setAsk(e.target.value)} placeholder="Ask about the studio" maxLength={600} aria-label="Ask a question" />
                 <button type="submit" aria-label="Ask" disabled={typing || !ask.trim()}><Send /></button>
               </form>
             </>

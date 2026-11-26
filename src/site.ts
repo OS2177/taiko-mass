@@ -30,15 +30,21 @@ export const card = {
 export const greeter = {
   hello: [
     'Hi, welcome to iaos21.',
-    'I am Jack\'s agent. I can answer questions about what we build, and I pass your details on to Jack. Leave your name and email below and he will be in touch himself.',
+    'I am Jack\'s agent. Do you have a question about what we build, or would you like to leave your details for Jack? He reads every message himself.',
   ],
   access: (build: string) => [
     `Hi, welcome to iaos21. You are asking for access to ${build}.`,
-    'I am Jack\'s agent. Leave your name and email below, and tell us what you would like to use it for; Jack opens the door himself and will be in touch.',
+    'I am Jack\'s agent. Would you like to leave your details for Jack now, or ask something first? He opens the door himself.',
   ],
-  thanks: (name: string) => `Thank you, ${name}. Your details are with Jack now. He will be in touch.`,
-  thanksAccess: (name: string, build: string) => `Thank you, ${name}. Your request for ${build} is with Jack now. He will be in touch.`,
-  offline: 'I cannot answer that right now. Leave your details in the form and Jack will reply himself.',
+  // The two choices under the welcome
+  askFirst: 'I have a question',
+  leave: 'Leave my details',
+  leaveFor: (build: string) => `Leave my details for ${build}`,
+  // Handing over to the form: the agent wishes them well and the form takes the window
+  bye: 'Lovely. Here is the form; Jack will be in touch himself. Have a nice day.',
+  thanks: (name: string) => `Thank you, ${name}. Your details are with Jack now. He will be in touch. Have a nice day.`,
+  thanksAccess: (name: string, build: string) => `Thank you, ${name}. Your request for ${build} is with Jack now. He will be in touch. Have a nice day.`,
+  offline: 'I cannot answer that right now. Leave your details and Jack will reply himself.',
 }
 
 // The opening film, made in DEPLOY. Live in the cockpit publishes it to iaos21.com and the page reads it
