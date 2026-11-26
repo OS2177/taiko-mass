@@ -30,6 +30,15 @@ export function Home() {
   const [contact, setContact] = useState<string | false>(contactFromAddress)
   const scroller = useRef<HTMLDivElement>(null)
 
+  // The page opens at the top, on the hero. A phone otherwise restores the last position, and a
+  // leftover /#builds (left by closing a window) would jump straight to the second section.
+  useEffect(() => {
+    history.scrollRestoration = 'manual'
+    const h = location.hash.slice(1)
+    if (h === 'builds' || h === 'top') history.replaceState(null, '', '/')
+    if (!slugFromAddress() && contactFromAddress() === false) window.scrollTo(0, 0)
+  }, [])
+
   // Back/forward and typed addresses open or close the card
   useEffect(() => {
     const read = () => { setOpen(slugFromAddress()); setContact(contactFromAddress()) }
@@ -56,7 +65,7 @@ export function Home() {
 
   function close() {
     setOpen(null)
-    history.replaceState(null, '', '/#builds')
+    history.replaceState(null, '', '/')
   }
 
   function slide(dir: 1 | -1) {
