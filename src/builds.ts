@@ -25,6 +25,8 @@ export type Build = {
   url: string
   film?: string
   access?: string
+  /** The showroom (2026-11-26): a read-only copy any visitor can walk through, remix.iaos21.com/try. */
+  try?: string
 | 'half'
   about: string[]
   facts?: [string, string][]
@@ -50,6 +52,7 @@ export const BUILDS: Build[] = [
     film: '/film/remix.mp4',
     views: [img('remix-desk.webp'), img('remix-desk2.webp'), img('remix-dunes2.webp'), img('remix-phone.webp')],
     url: 'https://remix.iaos21.com',
+    try: 'https://remix.iaos21.com/try',
     access: 'By invitation',
 
     about: [
@@ -143,6 +146,7 @@ export const BUILDS: Build[] = [
     views: [img('mojima.webp'), img('mojima-v1.webp')],
     url: 'https://mojima.iaos21.com/',
     film: '/film/mojima.mp4',
+    try: 'https://remix.iaos21.com/try/mojima',
     access: 'By request',
 
     about: [

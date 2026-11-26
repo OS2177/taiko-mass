@@ -301,6 +301,8 @@ function Journey({ b, onClose }: { b: Build; onClose: () => void }) {
             <p className="muted">{b.about[0]}</p>
           </div>
           <div className="pop__actions">
+            {/* The showroom: walk through the real thing, read-only, no sign-in (2026-11-26). */}
+            {b.try && <OpenLink href={b.try}>Try {b.name}</OpenLink>}
             {b.url && <OpenLink href={b.url}>Open {b.name}</OpenLink>}
             {b.access && (
               <a className="button" href={`/#contact:${b.slug}`}>
