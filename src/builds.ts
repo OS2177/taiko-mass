@@ -123,6 +123,7 @@ export const BUILDS: Build[] = [
     film: '/film/deploy.mp4',
     views: [img('deploy-salt.webp'), img('deploy-v1.webp'), img('deploy-desk.webp')],
     url: 'https://deploy.iaos21.com',
+    try: 'https://deploy.iaos21.com/try',
     access: 'By request',
 
     about: [
