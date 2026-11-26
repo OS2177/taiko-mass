@@ -1,0 +1,58 @@
+/* THE AEON SHOWROOM (2026-11-26): one screen filling the page, a strip of the others at the foot, and the
+   tour's cards gliding over it in the site's own dark surface. Every class is `ae`. */
+.ae { position: fixed; inset: 0; background: var(--bg); overflow: hidden; }
+.ae__stage { position: absolute; inset: 52px 0 128px; display: grid; place-items: center; animation: ae-fade 700ms ease both; }
+.ae[data-screen="splash"] .ae__stage { inset: 0; }
+.ae__stage img { width: 100%; height: 100%; object-fit: contain; animation: ae-drift 28s ease-in-out infinite alternate; }
+.ae[data-screen="splash"] .ae__stage img { object-fit: cover; }
+@keyframes ae-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ae-drift { from { transform: scale(1); } to { transform: scale(1.025); } }
+.ae__top { position: absolute; top: 0; left: 0; right: 0; z-index: 3; height: 52px; display: flex; justify-content: space-between; align-items: center; gap: 16px; padding: 0 var(--gutter); background: var(--bg); border-bottom: 1px solid var(--line); font-size: 13px; color: var(--muted); }
+.ae[data-screen="splash"] .ae__top { background: linear-gradient(rgba(10, 10, 11, 0.85), rgba(10, 10, 11, 0)); border-bottom-color: transparent; }
+.ae__top p { margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ae__top b { color: var(--text); font-weight: 600; }
+.ae__ways { display: flex; gap: 18px; flex: none; }
+.ae__link { font: inherit; font-size: 13px; color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: none; }
+.ae__link:hover { color: var(--text); }
+.ae__strip { position: absolute; left: 0; right: 0; bottom: 0; z-index: 3; display: flex; gap: 8px; padding: 14px var(--gutter) 16px; overflow-x: auto; scrollbar-width: none; background: var(--bg); border-top: 1px solid var(--line); transition: opacity 300ms; }
+.ae[data-screen="splash"] .ae__strip { background: linear-gradient(rgba(10, 10, 11, 0), rgba(10, 10, 11, 0.9)); border-top-color: transparent; }
+.ae__strip::-webkit-scrollbar { display: none; }
+.ae__strip.is-quiet { opacity: 0.35; pointer-events: none; }
+.ae__strip button { flex: none; display: grid; gap: 6px; justify-items: start; width: 132px; font: inherit; color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer; }
+.ae__strip button img { width: 132px; height: 82px; object-fit: cover; border-radius: 6px; border: 1px solid var(--line); opacity: 0.7; transition: opacity 150ms, border-color 150ms; }
+.ae__strip button span { font-size: 11px; letter-spacing: 0.02em; white-space: nowrap; }
+.ae__strip button:hover img, .ae__strip button.is-on img { opacity: 1; border-color: var(--line-2); }
+.ae__strip button.is-on span { color: var(--text); }
+.ae__tour { position: absolute; inset: 0; z-index: 4; display: grid; place-items: end end; padding: 0 var(--gutter) 128px; background: rgba(10, 10, 11, 0.18); pointer-events: none; }
+.ae__tour.is-centre { place-items: center; padding-bottom: 0; background: rgba(10, 10, 11, 0.5); }
+.ae__card { position: relative; pointer-events: auto; width: min(440px, 100%); display: grid; gap: 10px; justify-items: start; padding: 26px 28px 24px; border-radius: 16px; background: rgba(17, 17, 19, 0.88); border: 1px solid var(--line-2); box-shadow: 0 30px 80px rgba(0, 0, 0, 0.6); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+.ae__card[data-glide="on"] { animation: ae-glide-on 620ms cubic-bezier(0.22, 0.9, 0.24, 1) both; }
+.ae__card[data-glide="back"] { animation: ae-glide-back 620ms cubic-bezier(0.22, 0.9, 0.24, 1) both; }
+.ae__card[data-glide] .ae__glyph { animation: ae-glyph 700ms 120ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.ae__card[data-glide] h2, .ae__card[data-glide] p { animation: ae-lines 560ms 160ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+.ae__card[data-glide] p:nth-of-type(2) { animation-delay: 240ms; }
+@keyframes ae-glide-on { from { transform: translateX(44px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes ae-glide-back { from { transform: translateX(-44px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes ae-glyph { from { transform: scale(0.7); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes ae-lines { from { transform: translateY(8px); opacity: 0; } to { transform: none; opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ae__card[data-glide], .ae__card[data-glide] *, .ae__stage, .ae__stage img { animation: none !important; } }
+.ae__glyph { width: 54px; height: 54px; border-radius: 15px; display: grid; place-items: center; font-size: 1.35rem; color: var(--text); background: rgba(255, 255, 255, 0.08); }
+.ae__badge { font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); border: 1px solid var(--line-2); border-radius: 999px; padding: 3px 9px; }
+.ae__card h2 { margin: 2px 0 0; font-family: var(--tight); font-weight: 600; font-size: 24px; line-height: 1.15; letter-spacing: -0.02em; color: var(--text); }
+.ae__card p { margin: 0; font-size: 15px; line-height: 1.5; color: var(--muted); }
+.ae__skip { position: absolute; top: 14px; right: 16px; font: inherit; font-size: 13px; color: var(--muted); background: none; border: 0; padding: 4px 6px; cursor: pointer; }
+.ae__skip:hover { color: var(--text); }
+.ae__dots { display: flex; gap: 5px; margin-top: 4px; }
+.ae__dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--line-2); transition: width 200ms, background 200ms; }
+.ae__dots i.is-on { width: 20px; border-radius: 3px; background: var(--text); }
+.ae__actions { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+.ae__actions .button { height: 38px; padding: 0 16px; font-size: 13px; cursor: pointer; font-family: inherit; background: transparent; color: var(--text); }
+.ae__actions .button--solid { background: var(--text); color: var(--bg); }
+@media (max-width: 760px) {
+  .ae__top span { display: none; }
+  .ae__stage { inset: 52px 0 104px; }
+  .ae__strip { padding-bottom: 12px; }
+  .ae__strip button { width: 96px; } .ae__strip button img { width: 96px; height: 60px; }
+  .ae__tour { place-items: end center; padding: 0 12px 104px; }
+  .ae__card { padding: 22px 20px 20px; }
+}

@@ -77,6 +77,7 @@ export const BUILDS: Build[] = [
     film: '/film/kosmo.mp4',
     views: [img('kosmo-larder.webp'), img('kosmo-desk.webp'), img('kosmo-desk2.webp')],
     url: 'https://iaos21.com/kosmo/',
+    try: 'https://iaos21.com/kosmo/try',
     access: 'The kitchen is by request',
 
     about: [
@@ -190,6 +191,7 @@ export const BUILDS: Build[] = [
     hero: img('aeon-splash.webp'),
     views: [img('aeon-soundlab.webp'), img('aeon-decks.webp'), img('aeon-perform.webp'), img('aeon-fm.webp'), img('aeon-arrange.webp'), img('aeon-overview.webp')],
     url: '',
+    try: 'https://iaos21.com/try/aeon',
     access: 'Native app, not public yet',
 
     about: [
