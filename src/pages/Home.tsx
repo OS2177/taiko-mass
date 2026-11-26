@@ -165,27 +165,25 @@ export function Home() {
   )
 }
 
-// One card in the carousel: the build's front door in a dark frame (its walk-through film plays there
-// while the card is in view), and under it what it is, what it is today, and the ways in (Jack,
-// 2026-11-26: the words from the old pop-up window live here now; there is no window any more).
+// One card in the carousel: the build's front door in a dark frame, and under it what it is, what it is
+// today, and the ways in (Jack, 2026-11-26: the words from the old pop-up window live here now; there is no
+// window any more). The frame shows the splash picture; while the cursor rests on it the walk-through film
+// plays over it, and when the cursor leaves the splash gently returns (Jack, 2026-11-26). Seeing the inside
+// of a build otherwise means pressing Try.
 function Card({ b, eager }: { b: Build; eager: boolean }) {
-  const frame = useRef<HTMLDivElement>(null)
   const video = useRef<HTMLVideoElement>(null)
+  const [hover, setHover] = useState(false)
   useEffect(() => {
-    const v = video.current, f = frame.current
-    if (!v || !f) return
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) v.play().catch(() => {}); else v.pause() }, { threshold: 0.4 })
-    io.observe(f)
-    return () => io.disconnect()
-  }, [])
+    const v = video.current
+    if (!v) return
+    if (hover) { v.currentTime = 0; v.play().catch(() => {}) }
+    else { const t = window.setTimeout(() => { v.pause(); v.currentTime = 0 }, 600); return () => window.clearTimeout(t) }
+  }, [hover])
   return (
     <article className="card" data-slug={b.slug} id={b.slug}>
-      <div className="card__frame" ref={frame}>
-        {b.film ? (
-          <video ref={video} src={b.film} poster={b.hero} muted loop playsInline preload={eager ? 'metadata' : 'none'} disablePictureInPicture />
-        ) : (
-          <img src={b.hero} alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" />
-        )}
+      <div className={`card__frame${hover && b.film ? ' is-playing' : ''}`} onPointerEnter={(e) => { if (e.pointerType === 'mouse') setHover(true) }} onPointerLeave={() => setHover(false)}>
+        <img src={b.hero} alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" />
+        {b.film && <video ref={video} className="card__film" src={b.film} muted loop playsInline preload="none" disablePictureInPicture aria-hidden="true" />}
         <span className="card__kind label">{KINDS[b.kind]}</span>
       </div>
       <div className="card__body">
