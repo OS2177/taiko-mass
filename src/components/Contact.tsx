@@ -159,7 +159,7 @@ export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?:
                     <span>Sent. Jack will be in touch.</span>
                   </div>
                 )}
-                {typing && <div className="cw__turn cw__turn--runner"><p className="muted">…</p></div>}
+                {typing && <div className="cw__turn cw__turn--runner"><Coming /></div>}
               </div>
               <form className="cw__ask" onSubmit={question}>
                 <input ref={input} value={ask} onChange={(e) => setAsk(e.target.value)} placeholder="Ask about the studio" maxLength={600} aria-label="Ask a question" />
@@ -207,5 +207,24 @@ function ScanCode() {
       <p className="label muted">Scan to leave your details</p>
       <p className="muted">{address().replace(/^https?:\/\//, '')}</p>
     </div>
+  )
+}
+
+// The agent is coming (Jack, 2026-11-26): the answer is written on his own machine, which takes a
+// while. A breathing orb, and a line that moves on as the seconds pass, so the wait feels alive.
+const COMING: [number, string][] = [[0, 'Reaching Jack\'s agent'], [4, 'Reading your question'], [12, 'Writing an answer, on Jack\'s own machine'], [35, 'Nearly there']]
+export function Coming() {
+  const [t, setT] = useState(0)
+  useEffect(() => {
+    const t0 = Date.now()
+    const id = window.setInterval(() => setT((Date.now() - t0) / 1000), 1000)
+    return () => window.clearInterval(id)
+  }, [])
+  const line = COMING.filter(([at]) => t >= at).at(-1)![1]
+  return (
+    <p className="cw__coming" role="status" aria-live="polite">
+      <i className="cw__orb" aria-hidden="true" />
+      <span key={line}>{line}…</span>
+    </p>
   )
 }

@@ -404,18 +404,43 @@ body {
   color: rgba(255, 255, 255, 0.72);
   text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
 }
+.card__frame video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+/* Under the picture: what it is, what it is today, the ways in (the old window's foot, 2026-11-26) */
+.card__body {
+  display: grid;
+  gap: 8px;
+  padding-top: 18px;
+}
 .card__name {
   display: block;
   font-family: var(--tight);
   font-weight: 500;
-  font-size: 20px;
-  letter-spacing: -0.01em;
-  padding-top: 16px;
+  font-size: 22px;
+  letter-spacing: -0.015em;
 }
-.card__line {
-  display: block;
-  font-size: 15px;
-  padding-top: 2px;
+.card__about {
+  font-size: 14px;
+  line-height: 1.5;
+  max-width: 60ch;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 8px;
+}
+.card__actions .button {
+  height: 40px;
+  padding: 0 16px;
 }
 
 /* The opened card: a window over the page; the walk-through runs by itself inside it */
@@ -1013,4 +1038,56 @@ body {
   .cw__turn {
     max-width: 92%;
   }
+}
+
+/* The agent is coming (Jack, 2026-11-26): the answer is written on Jack's own machine and takes a while;
+   a breathing orb and a line that changes as the seconds pass, so the wait reads as something happening. */
+.cw__coming {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 14px 14px 14px 4px;
+  background: rgba(14, 14, 16, 0.72);
+  border: 1px solid var(--line);
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 14px;
+}
+.cw__orb {
+  position: relative;
+  width: 12px;
+  height: 12px;
+  flex: none;
+}
+.cw__orb::before,
+.cw__orb::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+.cw__orb::before {
+  background: radial-gradient(circle at 35% 35%, #fff, #c9b8ff 45%, #7f6cf0 100%);
+  animation: cw-breathe 1.8s ease-in-out infinite;
+}
+.cw__orb::after {
+  border: 1px solid rgba(201, 184, 255, 0.7);
+  animation: cw-ring 1.8s ease-out infinite;
+}
+.cw__coming span {
+  animation: cw-words 0.5s ease;
+}
+@keyframes cw-breathe {
+  0%, 100% { transform: scale(0.85); opacity: 0.85; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+@keyframes cw-ring {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+@keyframes cw-words {
+  from { opacity: 0; transform: translateY(3px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cw__orb::before, .cw__orb::after, .cw__coming span { animation: none; }
 }
