@@ -151,7 +151,6 @@ export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?:
                 {fresh && !typing && (
                   <div className="cw__chips">
                     <button type="button" onClick={() => handOver()}>{forBuild ? greeter.leaveFor(forBuild.name) : greeter.leave}</button>
-                    <button type="button" onClick={() => input.current?.focus()}>{greeter.askFirst}</button>
                   </div>
                 )}
                 {sent && (

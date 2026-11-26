@@ -36,8 +36,7 @@ export const greeter = {
     `Hi, welcome to iaos21. You are asking for access to ${build}.`,
     'I am Jack\'s agent. Would you like to leave your details for Jack now, or ask something first? He opens the door himself.',
   ],
-  // The two choices under the welcome
-  askFirst: 'I have a question',
+  // The choice under the welcome (a question just goes in the ask box)
   leave: 'Leave my details',
   leaveFor: (build: string) => `Leave my details for ${build}`,
   // Handing over to the form: the agent wishes them well and the form takes the window
