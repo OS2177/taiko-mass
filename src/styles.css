@@ -943,6 +943,32 @@ body {
 .cw__chips button:hover {
   border-color: var(--text, #fff);
 }
+/* The pill that leads on wears a soft, slowly turning line of colour, so it reads as the thing to press
+   even when the agent is away and cannot say so (Jack, 2026-11-27). */
+@property --cw-turn { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
+.cw__chips .cw__lit {
+  position: relative;
+  border-color: transparent;
+  background-clip: padding-box;
+}
+.cw__chips .cw__lit::before {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(from var(--cw-turn), #f7a6c1, #9fd2ff, #ffe39a, #b9f0c9, #f7a6c1);
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.85;
+  animation: cw-turn 7s linear infinite;
+  pointer-events: none;
+}
+.cw__chips .cw__lit:hover::before { opacity: 1; }
+@keyframes cw-turn { to { --cw-turn: 360deg; } }
+@media (prefers-reduced-motion: reduce) { .cw__chips .cw__lit::before { animation: none; } }
 .cw__problem {
   font-size: 13px;
   color: #ffb4a6;

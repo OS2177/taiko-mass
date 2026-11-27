@@ -44,6 +44,10 @@ export const greeter = {
   thanks: (name: string) => `Thank you, ${name}. Your details are with Jack now. He will be in touch. Have a nice day.`,
   thanksAccess: (name: string, build: string) => `Thank you, ${name}. Your request for ${build} is with Jack now. He will be in touch. Have a nice day.`,
   offline: 'I cannot answer that right now. Leave your details and Jack will reply himself.',
+  // Said right after the welcome when the agent's computer is not reachable (studio op 'status'): the visitor
+  // knows before typing, and the pill under it is the way on (Jack, 2026-11-27).
+  away: 'I am away from my desk at the moment, so I cannot answer questions right now. Leave your details and Jack will reply himself.',
+  awayAsk: 'The agent is away: leave your details instead',
 }
 
 // The opening film, made in DEPLOY. Live in the cockpit publishes it to iaos21.com and the page reads it

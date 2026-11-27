@@ -31,7 +31,17 @@ export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?:
   const stream = useRef<HTMLDivElement>(null)
   const input = useRef<HTMLInputElement>(null)
   const opening = (forBuild ? greeter.access(forBuild.name) : greeter.hello).length
-  const fresh = turns.length <= opening && !sent
+  // Is the agent here? Asked once when the window opens (op 'status': the switch on and Jack's computer asking for
+  // work lately). Away: one more line after the welcome, and the ask box points to the form instead of waiting 90 s.
+  const [away, setAway] = useState(false)
+  useEffect(() => {
+    let live = true
+    fetch(site.studioApi, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'status' }) })
+      .then((r) => r.json()).then((j) => { if (live && j?.online === false) { setAway(true); setTurns((cur) => (cur.some((t) => t.text === greeter.away) ? cur : [...cur, { who: 'runner', text: greeter.away }])) } })
+      .catch(() => {})
+    return () => { live = false }
+  }, [])
+  const fresh = turns.length <= opening + (away ? 1 : 0) && !sent
 
   // The newest line stays in view
   useEffect(() => { stream.current?.scrollTo({ top: stream.current.scrollHeight, behavior: 'smooth' }) }, [turns, typing, view])
@@ -71,7 +81,9 @@ export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?:
     const text = ask.trim().slice(0, 600)
     if (!text || typing) return
     const next: Turn[] = [...turns, { who: 'visitor', text }]
-    setTurns(next); setAsk(''); setTyping(true)
+    setTurns(next); setAsk('')
+    if (away) { if (!sent) handOver(greeter.offline); else say(greeter.offline); return }
+    setTyping(true)
     try {
       const r = await fetch(site.studioApi, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ op: 'ask', turns: next.slice(-12) }) })
       const j = await r.json().catch(() => ({}))
@@ -150,7 +162,7 @@ export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?:
                 ))}
                 {fresh && !typing && (
                   <div className="cw__chips">
-                    <button type="button" onClick={() => handOver()}>{forBuild ? greeter.leaveFor(forBuild.name) : greeter.leave}</button>
+                    <button type="button" className="cw__lit" onClick={() => handOver()}>{forBuild ? greeter.leaveFor(forBuild.name) : greeter.leave}</button>
                   </div>
                 )}
                 {sent && (
@@ -162,7 +174,7 @@ export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?:
                 {typing && <div className="cw__turn cw__turn--runner"><Coming /></div>}
               </div>
               <form className="cw__ask" onSubmit={question}>
-                <input ref={input} value={ask} onChange={(e) => setAsk(e.target.value)} placeholder="Ask about the studio" maxLength={600} aria-label="Ask a question" />
+                <input ref={input} value={ask} onChange={(e) => setAsk(e.target.value)} placeholder={away ? greeter.awayAsk : 'Ask about the studio'} maxLength={600} aria-label="Ask a question" />
                 <button type="submit" aria-label="Ask" disabled={typing || !ask.trim()}><Send /></button>
               </form>
             </>
