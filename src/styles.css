@@ -668,9 +668,10 @@ body {
   inset: 0;
 }
 
-/* About Jack */
+/* About Jack (top and bottom only: the sides keep the gutter set above, so the words never touch the phone's edge) */
 .about {
-  padding: clamp(40px, 7vw, 96px) 0 clamp(60px, 9vw, 120px);
+  padding-top: clamp(40px, 7vw, 96px);
+  padding-bottom: clamp(60px, 9vw, 120px);
   border-top: 1px solid var(--line);
 }
 .about__grid {
