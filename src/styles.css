@@ -701,7 +701,7 @@ body {
 }
 /* The label belongs to the list under it, not to the text above (Jack, 2026-11-27): clear air above, close below. */
 .about__grid .topics__label {
-  margin-top: 28px;
+  margin-top: 52px;
   margin-bottom: 0;
 }
 .topics {
