@@ -397,13 +397,6 @@ body {
 .card:hover .card__frame img {
   transform: scale(1.015);
 }
-.card__kind {
-  position: absolute;
-  left: 16px;
-  bottom: 14px;
-  color: rgba(255, 255, 255, 0.72);
-  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.6);
-}
 /* The walk-through film sits over the splash, unseen; it fades in while the cursor rests on the frame and
    gently gives the splash back when it leaves */
 .card__film {

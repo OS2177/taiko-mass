@@ -184,7 +184,6 @@ function Card({ b, eager }: { b: Build; eager: boolean }) {
       <div className={`card__frame${hover && b.film ? ' is-playing' : ''}`} onPointerEnter={(e) => { if (e.pointerType === 'mouse') setHover(true) }} onPointerLeave={() => setHover(false)}>
         <img src={b.hero} alt="" loading={eager ? 'eager' : 'lazy'} decoding="async" />
         {b.film && <video ref={video} className="card__film" src={b.film} muted loop playsInline preload="none" disablePictureInPicture aria-hidden="true" />}
-        <span className="card__kind label">{KINDS[b.kind]}</span>
       </div>
       <div className="card__body">
         <p className="label muted card__status">{KINDS[b.kind]} · {b.status}</p>
