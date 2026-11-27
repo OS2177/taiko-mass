@@ -699,13 +699,15 @@ body {
   line-height: 1.6;
   max-width: 62ch;
 }
-.topics__label {
-  margin-top: 8px;
+/* The label belongs to the list under it, not to the text above (Jack, 2026-11-27): clear air above, close below. */
+.about__grid .topics__label {
+  margin-top: 28px;
+  margin-bottom: 0;
 }
 .topics {
   display: grid;
   gap: 6px;
-  padding-top: 8px;
+  padding-top: 0;
   font-size: 15px;
 }
 .topics a {
