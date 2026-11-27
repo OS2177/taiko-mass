@@ -947,9 +947,9 @@ body {
 .cw__chips .cw__lit::before {
   content: '';
   position: absolute;
-  inset: -1.5px;
+  inset: -1px;
   border-radius: inherit;
-  padding: 1.5px;
+  padding: 1px;
   background: conic-gradient(from var(--cw-turn), #f7a6c1, #9fd2ff, #ffe39a, #b9f0c9, #f7a6c1);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);

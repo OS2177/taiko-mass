@@ -42,6 +42,11 @@ export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?:
     return () => { live = false }
   }, [])
   const fresh = turns.length <= opening + (away ? 1 : 0) && !sent
+  // The pill comes back whenever the agent's last line points at the form: the away or offline line, or an
+  // answer that amounts to "leave your details and Jack will be in touch" (Jack, 2026-11-27: before, it was
+  // only under the welcome, and a visitor had to close and reopen the window to find the form again).
+  const last = turns[turns.length - 1]
+  const offer = !sent && last?.who === 'runner' && (fresh || last.text === greeter.away || last.text === greeter.offline || /leave (your|his|their) details|will be in touch/i.test(last.text))
 
   // The newest line stays in view
   useEffect(() => { stream.current?.scrollTo({ top: stream.current.scrollHeight, behavior: 'smooth' }) }, [turns, typing, view])
@@ -106,7 +111,7 @@ export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?:
     } finally { setTyping(false) }
   }
 
-  const toggle = (v: Exclude<View, 'chat' | 'form'>) => setView((cur) => (cur === v ? 'chat' : v))
+  const toggle = (v: Exclude<View, 'chat'>) => setView((cur) => (cur === v ? 'chat' : v))
 
   return (
     <div className="pop" role="dialog" aria-modal="true" aria-label="Contact the studio" onClick={onClose}>
@@ -115,8 +120,11 @@ export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?:
           <span className="pop__dots" aria-hidden="true"><i /><i /><i /></span>
           <span className="pop__address label">iaos21 · contact</span>
           <span className="cw__tools">
+            <button className={`cw__tool${view === 'form' ? ' is-on' : ''}`} onClick={() => toggle('form')} aria-pressed={view === 'form'} title={view === 'form' ? 'Back to the chat' : 'Leave your details'}>
+              <Form />
+            </button>
             <button className={`cw__tool${view === 'card' ? ' is-on' : ''}`} onClick={() => toggle('card')} aria-pressed={view === 'card'} title={view === 'card' ? 'Back to the chat' : 'Business card'}>
-              {view === 'card' ? <Form /> : <Card />}
+              <Card />
             </button>
             <button className={`cw__tool${view === 'qr' ? ' is-on' : ''}`} onClick={() => toggle('qr')} aria-pressed={view === 'qr'} title={view === 'qr' ? 'Close the code' : 'A code to scan: it opens this window'}>
               <Qr />
@@ -160,7 +168,7 @@ export function Contact({ onClose, forBuild }: { onClose: () => void; forBuild?:
                     <p>{t.text}</p>
                   </div>
                 ))}
-                {fresh && !typing && (
+                {offer && !typing && (
                   <div className="cw__chips">
                     <button type="button" className="cw__lit" onClick={() => handOver()}>{forBuild ? greeter.leaveFor(forBuild.name) : greeter.leave}</button>
                   </div>
