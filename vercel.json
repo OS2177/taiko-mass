@@ -13,6 +13,9 @@
     { "source": "/kosmopoliet", "destination": "https://kosmopoliet.vercel.app/kosmopoliet" },
     { "source": "/kosmopoliet/", "destination": "https://kosmopoliet.vercel.app/kosmopoliet" },
     { "source": "/kosmopoliet/:path+", "destination": "https://kosmopoliet.vercel.app/kosmopoliet/:path+" },
+    { "source": "/scout", "destination": "https://SCOUT-DEPLOYMENT.vercel.app/scout/" },
+    { "source": "/scout/", "destination": "https://SCOUT-DEPLOYMENT.vercel.app/scout/" },
+    { "source": "/scout/:path+", "destination": "https://SCOUT-DEPLOYMENT.vercel.app/scout/:path+" },
     { "source": "/taiko-mass", "destination": "/taiko-mass/index.html" },
     { "source": "/((?!assets/|img/|taiko-mass/|.*\\..*).*)", "destination": "/index.html" }
   ],
